@@ -100,8 +100,14 @@
           <!-- Date -->
           <span class="date-time info">On
             <span class="date">2018-01-22</span>
-            <span class="time">21:32:30</span>
+            <span class="time">21:48:48</span>
           </span>
+          
+          <!--  Categories  -->
+            <span class="categories info">Under 
+
+<a href="/categories/学习/">学习</a>
+</span>
           
         </div>
         <!-- Tags -->
@@ -118,7 +124,30 @@
         <div class="post-content">
           <h1 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h1><blockquote>
 <p>目前主流卷积神经网络，模型参数巨大。并且计算卷积层和全连接层需要大量的浮点矩阵乘法，导致计算开销也非常大。这样卷积神经网络模型在终端部署和低延迟需求场景下难以应用，必须经过模型压缩和裁剪。一般来说，卷积神经网络模型参数主要来自全连接层，计算开销主要来自卷积层。以经典的VGG-16网络为例<br>虽然云计算可以将一部分计算需求转移到云端，但相对于一些高实时性计算场景而言，云计算的带宽、延迟和全时可用性面临着巨大的挑战，从而无法替代本地运算。<br>许多研究表明，深度神经网络存在过参数化——模型内部参数存在着巨大的冗余。有研究表明[1]，只需给定很小一部分的参数子集（大概是全部参数的5%），便能够完整地重构出剩余的参数，从而揭示了模型压缩的可行性。不过这种参数的冗余在模型训练过程中，是十分必要的<br>除了单纯追求压缩比和精度保证，大部分的模型压缩是能够带来速度的提升——所以模型压缩既包含了体积压缩也包含了时间压缩。<br>当然也是有纯粹的模型加速，例如：</p>
+<h1 id="模型压缩的分类"><a href="#模型压缩的分类" class="headerlink" title="模型压缩的分类"></a>模型压缩的分类</h1><p>根据压缩过程对网络结构的破坏程度，可以将模型压缩技术分为“前端压缩”与“后端压缩”<br>所谓前端压缩，就是指不改变原有网络结构的压缩技术。其最终模型可以完美适配现有的深度学习框架。<br>后端压缩则为了极致的压缩比，不得不对网络结构进行改造，并且这种改造往往是不可逆的。同时为了理想的压缩效果，必须开发配套的运行库，<br>甚至是专门的硬件设备，从而带来了巨大的维护成本。</p>
 </blockquote>
+<table>
+<thead>
+<tr>
+<th>前端压缩</th>
+<th>后端压缩</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.知识蒸馏(knowledge distillation)</td>
+<td>1.低秩近似(low-rank factorization)</td>
+</tr>
+<tr>
+<td>2.滤波器层面的剪枝(filter-level pruning)</td>
+<td>2.连接层面的剪枝connectivity-level pruning)</td>
+</tr>
+<tr>
+<td>3.</td>
+<td>3.参数量化(quantization)</td>
+</tr>
+</tbody>
+</table>
 
         </div>
       </div>
