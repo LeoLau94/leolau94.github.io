@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="Leo Lau">
   <!-- Open Graph Data -->
-  <meta property="og:title" content="Hello World"/>
+  <meta property="og:title" content="剪枝与稀疏约束"/>
   <meta property="og:description" content="A naive student from SZU" />
   <meta property="og:site_name" content="A Secret Garden"/>
   <meta property="og:type" content="article" />
@@ -43,7 +43,7 @@
     <div class="row">
       <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
         <div class="page-title with-background-image">
-          <p class="title">Hello World</p>
+          <p class="title">剪枝与稀疏约束</p>
           <p class="subtitle"></p>
         </div>
         <div class="site-menu with-background-image">
@@ -99,24 +99,46 @@
           
           <!-- Date -->
           <span class="date-time info">On
-            <span class="date">2018-01-22</span>
+            <span class="date">2018-01-23</span>
             <span class="time">11:13:27</span>
           </span>
+          
+          <!--  Categories  -->
+            <span class="categories info">Under 
+
+<a href="/categories/学习/">学习</a>
+</span>
           
         </div>
         <!-- Tags -->
         
+          <div class="post-tags text-muted">
+            Tags: 
+
+<a class="tag" href="/tags/模型压缩与加速/">#模型压缩与加速</a>
+
+
+          </div>
+        
         <!-- Post Main Content -->
         <div class="post-content">
-          <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+          <h1 id="剪枝-amp-稀疏约束"><a href="#剪枝-amp-稀疏约束" class="headerlink" title="剪枝&amp;稀疏约束"></a>剪枝&amp;稀疏约束</h1><blockquote>
+<p>剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。</p>
+<p>常用的剪枝算法一般有如下操作流程：</p>
+<ol>
+<li>衡量神经元的重要程度</li>
+<li>移除一部分不重要的神经元</li>
+<li>对网络进行微调（fine-tuning）</li>
+<li>返回第一步，进行下一轮剪枝。</li>
+</ol>
+<p>在实际操作中，还常常使用𝑙_1和𝑙_2进行正则化，以促使网络的权重趋向于零，以完成稀疏约束。</p>
+</blockquote>
+<h1 id="相关研究"><a href="#相关研究" class="headerlink" title="相关研究"></a>相关研究</h1><blockquote>
+<p>连接层面的剪枝：文献[5]提出了一个简单有效的方法，就是直接将低于某个阈值的权重连接全部剪除。他们认为，如果某个连接的权重值过低，则意味着该连接并不十分重要，因而可以移除。之后进行fine-tuning以完成参数更新。如此反复迭代，直到剪枝后的网络在性能和规模上达到较好的平衡。他们最终在保持网络分类精度不下降的情况下，可以将参数数量减少9~10倍。</p>
+<p>滤波器级别剪枝：文献[6,7]提出的方法都非常相近，均是粒度为filter-level的剪枝方法，区别则是文献[6]使用LASSO进行剪枝选择，而文献[7]则使用贪婪算法。</p>
+<p><img src="/img/paper6.png" alt="paper_6"><br>文献6</p>
+<p><img src="/img/paper7.png" alt="paper_7"><br>文献7</p>
+</blockquote>
 
         </div>
       </div>
