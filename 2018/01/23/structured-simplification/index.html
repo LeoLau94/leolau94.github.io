@@ -79,18 +79,24 @@
 
 
 
-<meta name="description" content="轻量化/紧凑的模型结构设计">
+<meta name="description" content="轻量化/紧凑的模型结构设计 相比于在已经训练好的模型上进行处理，轻量化模型模型设计则是另辟蹊径。轻量化模型设计主要思想在于设计更高效的「网络计算方式」（主要针对卷积方式），从而使网络参数减少的同时，不损失网络性能。">
 <meta name="keywords" content="模型压缩与加速">
 <meta property="og:type" content="article">
 <meta property="og:title" content="轻量化&#x2F;紧凑的模型结构设计">
 <meta property="og:url" content="https://leolau94.github.io/2018/01/23/structured-simplification/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="轻量化/紧凑的模型结构设计">
+<meta property="og:description" content="轻量化/紧凑的模型结构设计 相比于在已经训练好的模型上进行处理，轻量化模型模型设计则是另辟蹊径。轻量化模型设计主要思想在于设计更高效的「网络计算方式」（主要针对卷积方式），从而使网络参数减少的同时，不损失网络性能。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-23T06:34:33.420Z">
+<meta property="og:image" content="https://leolau94.github.io/img/fire_module.png">
+<meta property="og:image" content="https://leolau94.github.io/img/squeezeNet_architecture.png">
+<meta property="og:image" content="https://leolau94.github.io/img/squeezeNet_table_1.png">
+<meta property="og:image" content="https://leolau94.github.io/img/squeezeNet_table_2.png">
+<meta property="og:image" content="https://leolau94.github.io/img/MobileNet_figure2.png">
+<meta property="og:updated_time" content="2018-01-24T14:13:38.715Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="轻量化&#x2F;紧凑的模型结构设计">
-<meta name="twitter:description" content="轻量化/紧凑的模型结构设计">
+<meta name="twitter:description" content="轻量化/紧凑的模型结构设计 相比于在已经训练好的模型上进行处理，轻量化模型模型设计则是另辟蹊径。轻量化模型设计主要思想在于设计更高效的「网络计算方式」（主要针对卷积方式），从而使网络参数减少的同时，不损失网络性能。">
+<meta name="twitter:image" content="https://leolau94.github.io/img/fire_module.png">
 
 
 
@@ -323,7 +329,81 @@
 
       
         <h1 id="轻量化紧凑的模型结构设计">轻量化/紧凑的模型结构设计</h1>
-<a id="more"></a>
+<p>相比于在已经训练好的模型上进行处理，轻量化模型模型设计则是另辟蹊径。轻量化模型设计主要思想在于设计更高效的「网络计算方式」（主要针对卷积方式），从而使网络参数减少的同时，不损失网络性能。 <a id="more"></a></p>
+<h1 id="相关研究">相关研究</h1>
+<h2 id="squeezenet"><a href="https://arxiv.org/abs/1602.07360" target="_blank" rel="noopener">SqueezeNet</a></h2>
+<p>由伯克利&amp;斯坦福的研究人员合作发表于ICLR-2017。</p>
+<p>不同于传统的卷积方式，提出Fire Module；Fire Module 包含两部分：Squeeze层和Expand层。</p>
+<ol style="list-style-type: decimal">
+<li>Squeeze层，就是<span class="math inline">\(1×1\)</span>卷积，其卷积核数要少于上一层feature map数。</li>
+<li>Expand层，分别用<span class="math inline">\(1×1\)</span>和<span class="math inline">\(3×3\)</span>卷积，然后将卷积后的feature map concat起来。</li>
+</ol>
+<p>Insight:</p>
+<ol style="list-style-type: decimal">
+<li>将大部分的3×3的卷积核使用1×1卷积核进行替换</li>
+<li>减少进行3×3卷积的输入通道数。 假设卷积层全部由3×3的卷积核构成，那么要减少卷积层的参数，不仅需要减少3×3卷积核的个数， 还需要减少3×3卷积核的输入通道。</li>
+<li>在网络中晚点进行下采样，这样卷积层能有较大的activation map。在卷积网络中，每个卷积层都会输出一个activation map并且分辨率大小至少为1×1.这个分辨率由（1）输入数据大小（2）是否进行了下采样；所控制。因此，activation map大小对网络的分类准确率至关重要，越大分类准确率越高。推迟下采样能够导致更高的分类准确率。</li>
+</ol>
+<blockquote>
+<div class="figure">
+<img src="/img/fire_module.png">
+
+</div>
+</blockquote>
+<p>Fire Module有三个超参数：<span class="math inline">\(s_{1×1}\)</span>，<span class="math inline">\(e_{1×1}\)</span>，<span class="math inline">\(e_{3×3}\)</span>，分别代表对应卷积核的个数，同时也表示对应输出feature map的维数，在文中提出的SqueezeNet结构中，<span class="math inline">\(e_{1×1}+e_{3×3}&gt;s_{1×1}\)</span>,这样能够将进行3×3卷积的输入通道数减少。 首先，<span class="math inline">\(H×W×M\)</span>的feature map经过Squeeze层，得到<span class="math inline">\(s_{1×1}\)</span>个feature map，这里的<span class="math inline">\(s_{1×1}\)</span>均是小于<span class="math inline">\(M\)</span>的，以达到压缩的目的。 其次,<span class="math inline">\(H×W×s_{1×1}\)</span>的特征图输入到Expand层，分别经过<span class="math inline">\(1×1\)</span>卷积层和<span class="math inline">\(3×3\)</span>卷积层进行卷积，再将结果进行 concat，得到Fire module的输出，为<span class="math inline">\(H×M×(e_{1×1}+e_{3×3})\)</span>的feature map。</p>
+<p>SqueezeNet的网络结构：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/squeezeNet_architecture.png">
+
+</div>
+</blockquote>
+<p>网络结构主要还是使用Fire Module替代传统的卷积层，和VGG一样采用卷积堆叠的方式。</p>
+<p>网络结构各层维度：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/squeezeNet_table_1.png">
+
+</div>
+</blockquote>
+<p>实验结果：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/squeezeNet_table_2.png">
+
+</div>
+</blockquote>
+<p>小结：SqueezeNet 使用Fire Module替代传统的卷积层，由于大量使用了1×1的卷积核，因而权值参数相比传统的网络模型（如AlexNet）要大大减少，在同等准确率表现和无其他压缩算法使用的前提下，SqueezeNet仅需4.8MB的空间来存储，而与之相对应的AlexNet则需要240MB。而最关键的是，还能叠加其他压缩算法，比如使用6bit的Deep Compression，能将模型存储空间压缩至惊人的0.47MB而准确率几无损失。尽管SqueezeNet在压缩上表现惊人，但是在加速上似乎并没有提升。</p>
+<h2 id="xception"><a href="https://arxiv.org/abs/1610.02357" target="_blank" rel="noopener">Xception</a></h2>
+<h2 id="mobilenet"><a href="https://arxiv.org/abs/1704.04861" target="_blank" rel="noopener">MobileNet</a></h2>
+<p>由谷歌团队提出，发表于CVPR-2017。</p>
+<p>MobileNet顾名思义，是一种能够部署在移动端的网络模型。主要是采用depth-wise separable convolution的卷积方式和point-wise convolution替换传统的卷积计算过程。</p>
+<p>depth-wise separable convolution(下称DW卷积)，最早由2014的<strong><a href="https://arxiv.org/pdf/1403.1687v1.pdf" target="_blank" rel="noopener">L Sifre</a></strong>提出，每个输入通道只被一个卷积核卷积,可以视为特殊的group convolution(每组输入通道只被一组卷积核卷积。)</p>
+<p>point-wise convolution（下称PW卷积），就是1×1的卷积操作。</p>
+<blockquote>
+<div class="figure">
+<img src="/img/MobileNet_figure2.png">
+
+</div>
+</blockquote>
+<pre><code>C = input channels                       
+N = output feature channels               
+K = kernel size
+H = height of feature map
+W = width of feature map</code></pre>
+<p>传统卷积时间复杂度：<span class="math display">\[O_1=O(CNKKHW)\]</span> DW卷积时间复杂度：<span class="math display">\[O_2=O(KKCHW+CNHW)\]</span> 加速比：<span class="math display">\[O_2/O_1=1/N + 1/K^2 ≈ 1/K^2\]</span></p>
+<p>Insight:</p>
+<p>MobileNet将传统卷积分成两部分：</p>
+<ol style="list-style-type: decimal">
+<li>进行DW卷积，一个输入通道只被一个卷积核滤波；</li>
+<li>进行PW卷积，将DW卷积的输出进行线性组合。</li>
+</ol>
+<p>使用PW卷积的理由如下：</p>
+<blockquote>
+<p>However it only filters input channels, it does not combine them to create new features. So an additional layer that computes a linear combination of the output of depth-wise convolution via <span class="math inline">\(1×1\)</span> convolution is needed in order to generate these new features。</p>
+</blockquote>
+<p>从信息流动的角度而言，就是卷积层输出的每个feature map都应当包含输入的所有feature map的全部信息，而DW卷积是无法实现这个操作的，所以还需要PW卷积将DW卷积后的输出的每个feature map串联起来。</p>
+<h2 id="shufflenet"><a href="https://arxiv.org/abs/1707.01083" target="_blank" rel="noopener">ShuffleNet</a>，</h2>
 
       
     </div>
@@ -465,7 +545,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">1</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
@@ -498,7 +578,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#轻量化紧凑的模型结构设计"><span class="nav-number">1.</span> <span class="nav-text">轻量化/紧凑的模型结构设计</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#轻量化紧凑的模型结构设计"><span class="nav-number">1.</span> <span class="nav-text">轻量化/紧凑的模型结构设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关研究"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#squeezenet"><span class="nav-number">2.1.</span> <span class="nav-text">SqueezeNet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xception"><span class="nav-number">2.2.</span> <span class="nav-text">Xception</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mobilenet"><span class="nav-number">2.3.</span> <span class="nav-text">MobileNet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shufflenet"><span class="nav-number">2.4.</span> <span class="nav-text">ShuffleNet，</span></a></li></ol></li></ol></div>
             
 
           </div>

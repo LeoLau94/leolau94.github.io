@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="知识蒸馏  对于监督学习而言，同样复杂度的模型下，输入的监督信息越丰富，训练效果一般也就越好。因此，为了将复杂度更低的模型达到复杂度更高的模型的训练效果，可以使用更丰富的监督信息，这就是“知识蒸馏”的初始目的。   所谓“知识蒸馏”，其实是迁移学习的一种，其最终目的是将一个庞大复杂的模型所学习到的知识（更丰富的监督信息），通过一定的技术手段迁移到精简的小模型上，使得小模型能具有与大模型相">
+<meta name="description" content="知识蒸馏 对于监督学习而言，同样复杂度的模型下，输入的监督信息越丰富，训练效果一般也就越好。因此，为了将复杂度更低的模型达到复杂度更高的模型的训练效果，可以使用更丰富的监督信息，这就是“知识蒸馏”的初始目的。 所谓“知识蒸馏”，其实是迁移学习的一种，其最终目的是将一个庞大复杂的模型所学习到的知识（更丰富的监督信息），通过一定的技术手段迁移到精简的小模型上，使得小模型能具有与大模型相近的性能。">
 <meta name="keywords" content="模型压缩与加速">
 <meta property="og:type" content="article">
 <meta property="og:title" content="知识蒸馏">
 <meta property="og:url" content="https://leolau94.github.io/2018/01/23/knowledge-distillaiton/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="知识蒸馏  对于监督学习而言，同样复杂度的模型下，输入的监督信息越丰富，训练效果一般也就越好。因此，为了将复杂度更低的模型达到复杂度更高的模型的训练效果，可以使用更丰富的监督信息，这就是“知识蒸馏”的初始目的。   所谓“知识蒸馏”，其实是迁移学习的一种，其最终目的是将一个庞大复杂的模型所学习到的知识（更丰富的监督信息），通过一定的技术手段迁移到精简的小模型上，使得小模型能具有与大模型相">
+<meta property="og:description" content="知识蒸馏 对于监督学习而言，同样复杂度的模型下，输入的监督信息越丰富，训练效果一般也就越好。因此，为了将复杂度更低的模型达到复杂度更高的模型的训练效果，可以使用更丰富的监督信息，这就是“知识蒸馏”的初始目的。 所谓“知识蒸馏”，其实是迁移学习的一种，其最终目的是将一个庞大复杂的模型所学习到的知识（更丰富的监督信息），通过一定的技术手段迁移到精简的小模型上，使得小模型能具有与大模型相近的性能。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-23T12:18:50.949Z">
+<meta property="og:updated_time" content="2018-01-24T12:17:10.299Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="知识蒸馏">
-<meta name="twitter:description" content="知识蒸馏  对于监督学习而言，同样复杂度的模型下，输入的监督信息越丰富，训练效果一般也就越好。因此，为了将复杂度更低的模型达到复杂度更高的模型的训练效果，可以使用更丰富的监督信息，这就是“知识蒸馏”的初始目的。   所谓“知识蒸馏”，其实是迁移学习的一种，其最终目的是将一个庞大复杂的模型所学习到的知识（更丰富的监督信息），通过一定的技术手段迁移到精简的小模型上，使得小模型能具有与大模型相">
+<meta name="twitter:description" content="知识蒸馏 对于监督学习而言，同样复杂度的模型下，输入的监督信息越丰富，训练效果一般也就越好。因此，为了将复杂度更低的模型达到复杂度更高的模型的训练效果，可以使用更丰富的监督信息，这就是“知识蒸馏”的初始目的。 所谓“知识蒸馏”，其实是迁移学习的一种，其最终目的是将一个庞大复杂的模型所学习到的知识（更丰富的监督信息），通过一定的技术手段迁移到精简的小模型上，使得小模型能具有与大模型相近的性能。">
 
 
 
@@ -323,45 +323,25 @@
 
       
         <h1 id="知识蒸馏">知识蒸馏</h1>
-<blockquote>
 <p>对于监督学习而言，同样复杂度的模型下，输入的监督信息越丰富，训练效果一般也就越好。因此，为了将复杂度更低的模型达到复杂度更高的模型的训练效果，可以使用更丰富的监督信息，这就是“知识蒸馏”的初始目的。</p>
-</blockquote>
-<blockquote>
 <p>所谓“知识蒸馏”，其实是迁移学习的一种，其最终目的是将一个庞大复杂的模型所学习到的知识（更丰富的监督信息），通过一定的技术手段迁移到精简的小模型上，使得小模型能具有与大模型相近的性能。 <a id="more"></a> 两个关键点：1.如何提取知识；2.如何完成知识迁移。</p>
-</blockquote>
 <h1 id="相关研究">相关研究</h1>
-<blockquote>
 <p><a href="http://papers.nips.cc/paper/5484-do-deep-nets-really-need-to-be-deep" target="_blank" rel="noopener">Jimmy等人</a>认为，Softmax层的输入比类别标签包含了更多丰富的监督信息，因此可以使用它作为label来对小模型进行训练，所以训练问题转化为了一个回归问题：<span class="math display">\[L(W,β)=\frac{1}{2T}\sum_{t}\|g(x^{(t)};W,\beta)-z^{(t)}\|\]</span></p>
-</blockquote>
-<blockquote>
 <p><a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noopener">Hinton等人</a>认为，Softmax层的输出更好，因为它包含了所有类别的预测概率，可以视为一种软标签。传统意义上的类别标签只给出一个类别的信息，没有包含各类之前的相关信息。而Softmax的输出则包含了这种类间关系：预测概率越接近，表示这两类越相似。他们使用了一个超参数\(T\)来控制预测概率的平滑度：<span class="math display">\[q_i=\frac{\exp(z_i/T)}{\sum_j\exp(z_j/T)}\]</span></p>
-</blockquote>
-<blockquote>
 <blockquote>
 <p>其中\(T\)被称为“温度”，取值越大，预测概率分布也越平滑，通常取值为1。</p>
 </blockquote>
-</blockquote>
-<blockquote>
 <p>为了获得更高的预测精度，还可以使用传统的类别标签进行修正。因此，最终的损失函数由两部分组成：</p>
-</blockquote>
-<blockquote>
 <ol style="list-style-type: decimal">
 <li>由小模型的预测结果与大模型的“软标签”构成的交叉熵；</li>
 <li>由小模型的预测结果与大模型的传统类别标签构成的交叉熵。</li>
 </ol>
-</blockquote>
-<blockquote>
 <p>这两部分最终进行加权组合，两者的重要程度可以通过权重进行调节。</p>
-</blockquote>
-<blockquote>
 <p><a href="http://www.aaai.org/ocs/index.php/AAAI/AAAI16/paper/download/11977/12130" target="_blank" rel="noopener">Luo等人</a>认为，<a href="https://arxiv.org/abs/1503.02531" target="_blank" rel="noopener">Hinton等人</a>中温度\(T\)取值不容易确定，而且当类别较多时（例如人脸识别），由于“软标签”维度较高，模型训练难以收敛。因此，他们提出了，使用Softmax层前一层网络的输出作为小模型的标签来监督训练。这是因为该层的输出为Softmax层提供了信息但维度更少。不过，该层的输出也包含了许多噪声和无用的信息。因此，他们设计了一个算法来进行神经元选择，以去除这些无关维度。该算法主要思想是保留具有如下要求的特征维度：</p>
-</blockquote>
-<blockquote>
 <ol style="list-style-type: decimal">
 <li>该维度的特征具有足够的区分度</li>
 <li>不同维度之间的相关性尽可能低</li>
 </ol>
-</blockquote>
 
       
     </div>
@@ -507,7 +487,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">1</span>
                   <span class="site-state-item-name">标签</span>
                 
               </div>
