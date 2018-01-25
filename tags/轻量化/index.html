@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="模型压缩与加速," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -79,18 +79,16 @@
 
 
 
-<meta name="description" content="参数量化 所谓“量化”，指的是降低表达权重所需要的位数。">
-<meta name="keywords" content="模型压缩与加速">
-<meta property="og:type" content="article">
-<meta property="og:title" content="参数量化">
-<meta property="og:url" content="https://leolau94.github.io/2018/01/23/quantization/index.html">
+<meta name="description" content="A naive student from SZU">
+<meta property="og:type" content="website">
+<meta property="og:title" content="A Secret Garden">
+<meta property="og:url" content="https://leolau94.github.io/tags/轻量化/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="参数量化 所谓“量化”，指的是降低表达权重所需要的位数。">
+<meta property="og:description" content="A naive student from SZU">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-24T12:13:06.779Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="参数量化">
-<meta name="twitter:description" content="参数量化 所谓“量化”，指的是降低表达权重所需要的位数。">
+<meta name="twitter:title" content="A Secret Garden">
+<meta name="twitter:description" content="A naive student from SZU">
 
 
 
@@ -120,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="https://leolau94.github.io/2018/01/23/quantization/"/>
+  <link rel="canonical" href="https://leolau94.github.io/tags/轻量化/"/>
 
 
 
 
 
-  <title>参数量化 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title>标签: 轻量化 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
   
 
 
@@ -145,7 +143,7 @@
     
   
 
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -219,175 +217,54 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
-    
+  
+  
+  
+  <div class="post-block tag">
 
-  
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+        <h1>轻量化<small>标签</small>
+        </h1>
+      </div>
 
-  
-  
-  
+      
+        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/01/23/quantization/">
+    <header class="post-header">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Leo Lau">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar_leo.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="A Secret Garden">
-    </span>
-
-    
-      <header class="post-header">
-
+      <h2 class="post-title">
         
+            <a class="post-title-link" href="/2018/01/23/structured-simplification/" itemprop="url">
+              
+                <span itemprop="name">轻量化/紧凑的模型结构设计</span>
+              
+            </a>
         
-          <h1 class="post-title" itemprop="name headline">参数量化</h1>
-        
+      </h2>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T11:09:15+08:00">
-                2018-01-23
-              </time>
-            
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2018-01-23T13:56:20+08:00"
+              content="2018-01-23" >
+          01-23
+        </time>
+      </div>
 
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/学习/" itemprop="url" rel="index">
-                    <span itemprop="name">学习</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <h1 id="参数量化">参数量化</h1>
-<p>所谓“量化”，指的是降低表达权重所需要的位数。 <a id="more"></a> 核心思路：从权重中归纳出若干“代表”，由这些“代表”来表示某一类权重的具体数值。“代表”被存储在码本(codebook)中，而原权重矩阵仅需记录各自的码表索引即可，从而极大地降低了存储开销。</p>
-<h1 id="相关研究">相关研究</h1>
-
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/模型压缩与加速/" rel="tag"># 模型压缩与加速</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2018/01/23/low-rank-factorization/" rel="next" title="低秩近似">
-                <i class="fa fa-chevron-left"></i> 低秩近似
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/01/23/structured-simplification/" rel="prev" title="轻量化/紧凑的模型结构设计">
-                轻量化/紧凑的模型结构设计 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
+    </header>
   </article>
 
 
-
-    <div class="post-spread">
       
     </div>
+
   </div>
+  
+  
+  
+
+  
 
 
           </div>
@@ -395,10 +272,6 @@
 
 
           
-
-  
-
-
 
         </div>
         
@@ -419,17 +292,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -493,22 +357,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参数量化"><span class="nav-number">1.</span> <span class="nav-text">参数量化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关研究"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -655,10 +503,6 @@
   
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
 
   
 
