@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="模型压缩与加速," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -79,21 +79,14 @@
 
 
 
-<meta name="description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。">
-<meta name="keywords" content="模型压缩与加速">
-<meta property="og:type" content="article">
-<meta property="og:title" content="剪枝与稀疏约束">
-<meta property="og:url" content="https://leolau94.github.io/2018/01/23/pruning-sparsify/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="分类">
+<meta property="og:url" content="https://leolau94.github.io/categories/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://leolau94.github.io/img/paper6.png">
-<meta property="og:image" content="https://leolau94.github.io/img/paper7.png">
-<meta property="og:updated_time" content="2018-01-24T12:17:40.731Z">
+<meta property="og:updated_time" content="2018-01-26T05:08:02.499Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="剪枝与稀疏约束">
-<meta name="twitter:description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。">
-<meta name="twitter:image" content="https://leolau94.github.io/img/paper6.png">
+<meta name="twitter:title" content="分类">
 
 
 
@@ -123,13 +116,13 @@
 
 
 
-  <link rel="canonical" href="https://leolau94.github.io/2018/01/23/pruning-sparsify/"/>
+  <link rel="canonical" href="https://leolau94.github.io/categories/"/>
 
 
 
 
 
-  <title>剪枝与稀疏约束 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title>分类 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
   
 
 
@@ -254,213 +247,40 @@
 
   <div id="posts" class="posts-expand">
     
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/01/23/pruning-sparsify/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Leo Lau">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar_leo.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="A Secret Garden">
-    </span>
-
     
+    
+    <div class="post-block page">
       <header class="post-header">
 
-        
-        
-          <h1 class="post-title" itemprop="name headline">剪枝与稀疏约束</h1>
-        
+	<h1 class="post-title" itemprop="name headline">分类</h1>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T10:56:02+08:00">
-                2018-01-23
-              </time>
-            
 
-            
 
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/学习/" itemprop="url" rel="index">
-                    <span itemprop="name">学习</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+</header>
 
       
       
-
       
-        <h1 id="剪枝稀疏约束">剪枝&amp;稀疏约束</h1>
-<p>剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。 <a id="more"></a> 常用的剪枝算法一般有如下操作流程：</p>
-<ol style="list-style-type: decimal">
-<li>衡量神经元的重要程度</li>
-<li>移除一部分不重要的神经元</li>
-<li>对网络进行微调（fine-tuning）</li>
-<li>返回第一步，进行下一轮剪枝。</li>
-</ol>
-<p>在实际操作中，还常常使用𝑙_1和𝑙_2进行正则化，以促使网络的权重趋向于零，以完成稀疏约束。</p>
-<h1 id="相关研究">相关研究</h1>
-<p>连接层面的剪枝：文献[5]提出了一个简单有效的方法，就是直接将低于某个阈值的权重连接全部剪除。他们认为，如果某个连接的权重值过低，则意味着该连接并不十分重要，因而可以移除。之后进行fine-tuning以完成参数更新。如此反复迭代，直到剪枝后的网络在性能和规模上达到较好的平衡。他们最终在保持网络分类精度不下降的情况下，可以将参数数量减少9~10倍。</p>
-<p>滤波器级别剪枝：文献[6,7]提出的方法都非常相近，均是粒度为filter-level的剪枝方法，区别则是文献[6]使用LASSO进行剪枝选择，而文献[7]则使用贪婪算法。</p>
-<blockquote>
-<p><img src="/img/paper6.png" alt="paper_6"> 文献6</p>
-</blockquote>
-<blockquote>
-<p><img src="/img/paper7.png" alt="paper_7"> 文献7</p>
-</blockquote>
-
+      <div class="post-body">
+        
+        
+          <div class="category-all-page">
+            <div class="category-all-title">
+                目前共计 2 个分类
+            </div>
+            <div class="category-all">
+              <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/使用教程/">使用教程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/学习/">学习</a><span class="category-list-count">6</span></li></ul>
+            </div>
+          </div>
+        
+      </div>
+      
+      
       
     </div>
     
     
     
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/模型压缩与加速/" rel="tag"># 模型压缩与加速</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2018/01/23/knowledge-distillaiton/" rel="next" title="知识蒸馏">
-                <i class="fa fa-chevron-left"></i> 知识蒸馏
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/01/23/low-rank-factorization/" rel="prev" title="低秩近似">
-                低秩近似 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
-        <!-- JiaThis Button BEGIN -->
-<div class="jiathis_style">
-<span class="jiathis_txt">分享到：</span>
-<a class="jiathis_button_fav">收藏夹</a>
-<a class="jiathis_button_copy">复制网址</a>
-<a class="jiathis_button_email">邮件</a>
-<a class="jiathis_button_weixin">微信</a>
-<a class="jiathis_button_qzone">QQ空间</a>
-<a class="jiathis_button_tqq">腾讯微博</a>
-<a class="jiathis_button_douban">豆瓣</a>
-<a class="jiathis_button_share">一键分享</a>
-
-<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
-<a class="jiathis_counter_style"></a>
-</div>
-<script type="text/javascript" >
-var jiathis_config={
-  data_track_clickback:true,
-  summary:"",
-  shortUrl:false,
-  hideMore:false
-}
-</script>
-<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
-<!-- JiaThis Button END -->
-      
-    </div>
   </div>
 
 
@@ -493,17 +313,8 @@ var jiathis_config={
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -589,22 +400,6 @@ var jiathis_config={
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#剪枝稀疏约束"><span class="nav-number">1.</span> <span class="nav-text">剪枝&amp;稀疏约束</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关研究"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
