@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
+<meta name="description" content="旧终端的操作  在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
 <meta name="keywords" content="HEXO教程，HEXO迁移">
 <meta property="og:type" content="article">
 <meta property="og:title" content="（转载）如何在不同终端之间迁移HEXO博客文件夹">
 <meta property="og:url" content="https://leolau94.github.io/2018/01/25/how-to-migrate-hexo-folder/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
+<meta property="og:description" content="旧终端的操作  在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-25T13:22:48.083Z">
+<meta property="og:updated_time" content="2018-01-26T03:59:40.939Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="（转载）如何在不同终端之间迁移HEXO博客文件夹">
-<meta name="twitter:description" content="在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
+<meta name="twitter:description" content="旧终端的操作  在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
 
 
 
@@ -300,7 +300,8 @@
       
 
       
-        <blockquote>
+        <h1 id="旧终端的操作">旧终端的操作</h1>
+<blockquote>
 <p>在<strong>username.github.io</strong>仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。 <a id="more"></a></p>
 </blockquote>
 <blockquote>
@@ -318,12 +319,42 @@
 <p>至此，hexo的环境文件已经全部托管在github的hexo分支了。</p>
 </blockquote>
 <p>作者：nikolausliu 链接：https://www.jianshu.com/p/fceaf373d797 來源：简书 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+<h2 id="作者没有注意的一点">作者没有注意的一点：</h2>
 <p>以上步骤过后，<strong>如果hexo使用的主题是<code>git clone</code>命令得到的</strong>，那么还需要做一下几个步骤：</p>
 <ol style="list-style-type: decimal">
 <li>看下next主题文件夹下是否有.git文件夹和.gitignore文件，这两个文件存在的话git提交是会忽略掉next主题的。</li>
 <li>删除后因为该文件夹已经被纳入了版本管理中，先清空该文件夹的本地缓存然后再添加就行了 <code>git rm -r --cached path</code></li>
 <li><code>git add -A</code>，<code>git commit -m &quot;some description&quot;</code>，<code>git push origin hexo</code></li>
 </ol>
+<h1 id="新终端的操作">新终端的操作</h1>
+<h2 id="在新终端中git-clone成功后本地出现myhexo文件夹开始安装hexo环境">在新终端中git clone成功后，本地出现myhexo文件夹，开始安装hexo环境</h2>
+<ol style="list-style-type: decimal">
+<li><code>cd myhexo</code></li>
+<li><code>npm install hexo</code></li>
+<li><code>npm install</code></li>
+<li><code>npm install hexo-deployer-git</code></li>
+</ol>
+<h2 id="在新终端中继续使用和管理hexo">在新终端中继续使用和管理hexo</h2>
+<h3 id="新建文章并修改">新建文章并修改</h3>
+<p><code>hexo new xxx</code></p>
+<h3 id="提交原始md文件至远程repo">提交原始md文件至远程repo</h3>
+<ol style="list-style-type: decimal">
+<li><code>git status</code></li>
+<li><code>git add</code></li>
+<li><code>git commit -m xx</code></li>
+<li><code>git push</code></li>
+</ol>
+<h3 id="发布静态网页">发布静态网页</h3>
+<p>hexo g -d</p>
+<h2 id="切换至旧终端使用hexo">切换至旧终端使用hexo</h2>
+<h3 id="更新网站原始文件">更新网站原始文件</h3>
+<ol style="list-style-type: decimal">
+<li><code>git pull</code></li>
+<li><code>hexo g</code></li>
+<li><code>hexo server</code></li>
+</ol>
+<h1 id="section">2018/1/26</h1>
+<p>更详细的可以参考这个教程：<strong><a href="http://wangmuduo.com/2016/04/02/hexo-change-os/" target="_blank" rel="noopener">Hexo 换终端/换电脑小记</a></strong></p>
 
       
     </div>
@@ -414,8 +445,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -479,6 +519,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#旧终端的操作"><span class="nav-number">1.</span> <span class="nav-text">旧终端的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#作者没有注意的一点"><span class="nav-number">1.1.</span> <span class="nav-text">作者没有注意的一点：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#新终端的操作"><span class="nav-number">2.</span> <span class="nav-text">新终端的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在新终端中git-clone成功后本地出现myhexo文件夹开始安装hexo环境"><span class="nav-number">2.1.</span> <span class="nav-text">在新终端中git clone成功后，本地出现myhexo文件夹，开始安装hexo环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在新终端中继续使用和管理hexo"><span class="nav-number">2.2.</span> <span class="nav-text">在新终端中继续使用和管理hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新建文章并修改"><span class="nav-number">2.2.1.</span> <span class="nav-text">新建文章并修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提交原始md文件至远程repo"><span class="nav-number">2.2.2.</span> <span class="nav-text">提交原始md文件至远程repo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布静态网页"><span class="nav-number">2.2.3.</span> <span class="nav-text">发布静态网页</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切换至旧终端使用hexo"><span class="nav-number">2.3.</span> <span class="nav-text">切换至旧终端使用hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更新网站原始文件"><span class="nav-number">2.3.1.</span> <span class="nav-text">更新网站原始文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section"><span class="nav-number">3.</span> <span class="nav-text">2018/1/26</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
