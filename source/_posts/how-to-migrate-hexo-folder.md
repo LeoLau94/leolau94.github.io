@@ -1,7 +1,8 @@
 ---
 title: （转载）如何在不同终端之间迁移HEXO博客文件夹
 date: 2018-01-25 20:41:33
-tags: [HEXO教程，HEXO迁移]
+tags: [HEXO教程,HEXO迁移]
+category: 使用教程
 ---
 # 旧终端的操作
 >在**username.github.io**仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。
