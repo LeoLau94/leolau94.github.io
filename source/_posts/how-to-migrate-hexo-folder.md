@@ -3,6 +3,7 @@ title: （转载）如何在不同终端之间迁移HEXO博客文件夹
 date: 2018-01-25 20:41:33
 tags: [HEXO教程，HEXO迁移]
 ---
+# 旧终端的操作
 >在**username.github.io**仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。
 <!-- more -->
 
@@ -22,9 +23,47 @@ tags: [HEXO教程，HEXO迁移]
 來源：简书
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
+## 作者没有注意的一点：
+
 以上步骤过后，**如果hexo使用的主题是`git clone`命令得到的**，那么还需要做一下几个步骤：
 
 1. 看下next主题文件夹下是否有.git文件夹和.gitignore文件，这两个文件存在的话git提交是会忽略掉next主题的。
 2. 删除后因为该文件夹已经被纳入了版本管理中，先清空该文件夹的本地缓存然后再添加就行了
 `git rm -r --cached path`
 3. `git add -A`，`git commit -m "some description"`，`git push origin hexo`
+
+#新终端的操作
+##在新终端中git clone成功后，本地出现myhexo文件夹，开始安装hexo环境
+
+1. `cd myhexo`
+2. `npm install hexo`
+3. `npm install`
+4. `npm install hexo-deployer-git`
+
+##在新终端中继续使用和管理hexo
+
+###新建文章并修改
+
+`hexo new xxx`
+
+###提交原始md文件至远程repo
+
+1. `git status`
+2. `git add`
+3. `git commit -m xx`
+4. `git push`
+
+###发布静态网页
+
+hexo g -d
+
+##切换至旧终端使用hexo
+
+###更新网站原始文件
+
+1. `git pull`
+2. `hexo g`
+3. `hexo server`
+
+#2018/1/26
+更详细的可以参考这个教程：**[Hexo 换终端/换电脑小记](http://wangmuduo.com/2016/04/02/hexo-change-os/)**
