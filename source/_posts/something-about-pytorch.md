@@ -16,23 +16,23 @@ category: 深度学习框架
 Parameters:	transforms (list of Transform objects) – list of transforms to compose.
 
 一个简单的预处理例子：
-
-	normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-	                                     std=[0.229, 0.224, 0.225])
-	train_transform = transforms.Compose(
-	    [
-	     transforms.RandomCrop((224,224)),
-	     transforms.ToTensor(),
-	     normalize
-	    ]
-	)
-	valid_transform = transforms.Compose(
-	    [
-	     transforms.Resize((224,224)),
-	     transforms.ToTensor(),
-	     normalize
-	    ]
-	)
+```
+normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+train_transform = transforms.Compose(
+    [
+     transforms.RandomCrop((224,224)),
+     transforms.ToTensor(),
+     normalize
+    ]
+)
+valid_transform = transforms.Compose(
+    [
+     transforms.Resize((224,224)),
+     transforms.ToTensor(),
+     normalize
+    ]
+)```
 
 #数据读写
 最常用的就是继承**torch.utils.data**里面的
@@ -64,64 +64,64 @@ Parameters:
 一个简单的自定义数据集例子：
 
 **这个例子是当初想自己实现分离训练集和验证集的代码，但是后来发现不那么好在一个dataset中分离，所以就弃坑了。代码并不能直接用，只是提供一个重写的思路。**
+```
+import torch
+import torch.utils.data as Data
+import torchvision.transforms as T
+import os
+import numpy as np
+from PIL import Image
+class ImageDataSet_Train(Data.Dataset):
 
-	import torch
-	import torch.utils.data as Data
-	import torchvision.transforms as T
-	import os
-	import numpy as np
-	from PIL import Image
-	class ImageDataSet_Train(Data.Dataset):
+def __init__(self,root,transforms=[],valid_rate=0.1):
+	transforms_error_msg = "either train_transforms & valid_transforms, or nothing"
+	valid_rate_error_msg = "valid_rate should be in the range [0,1]"
+	assert ((len(transforms)==0) or (len(transforms)==2)), transforms_error_msg
+	assert ((valid_size >= 0) and (valid_size <= 1)), valid_rate_error_msg
+	normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225])
+	# load train_data and then split it into train_set and valid_set according to valid_rate
+
+	label_folders = [os.path.join(root,img) for img in os.listdir(root)]
+	self.labels = [label.split('/')[-1] for label in label_folders]
+	imgs = [os.path.join(l,f) for l in label_folders for f in os.listdir(l)]
+	imgs = np.random.permutation(imgs)
+	set_size = len(imgs)
+	#calculate the size of valid_set and store the start and end index of valid_set[start,end)
+	split = np.floor(valid_rate*set_size)
+	self.valid_start = 0
+	self.valid_end = split
+	self.valid_set = imgs[self.valid_start:self.valid_end]
 	
-	def __init__(self,root,transforms=[],valid_rate=0.1):
-		transforms_error_msg = "either train_transforms & valid_transforms, or nothing"
-		valid_rate_error_msg = "valid_rate should be in the range [0,1]"
-		assert ((len(transforms)==0) or (len(transforms)==2)), transforms_error_msg
-		assert ((valid_size >= 0) and (valid_size <= 1)), valid_rate_error_msg
-		normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-		# load train_data and then split it into train_set and valid_set according to valid_rate
-
-		label_folders = [os.path.join(root,img) for img in os.listdir(root)]
-		self.labels = [label.split('/')[-1] for label in label_folders]
-		imgs = [os.path.join(l,f) for l in label_folders for f in os.listdir(l)]
-		imgs = np.random.permutation(imgs)
-		set_size = len(imgs)
-		#calculate the size of valid_set and store the start and end index of valid_set[start,end)
-		split = np.floor(valid_rate*set_size)
-		self.valid_start = 0
-		self.valid_end = split
-		self.valid_set = imgs[self.valid_start:self.valid_end]
-		
-		#concatenate the rest data as train_set
-		self.train_set = imgs[0:self.valid_start].extend(imgs[self.valid_end:])
-		
-		#if no transforms is given
-		if len(transforms) == 0:
-			self.train_transforms = T.Compose([
-				T.Resize([256,256]),
-				T.RandomCrop(32,padding=4),
-				T.RandomHorizontalFlip(),
-				T.ToTensor(),
-				normalize
-				])
-			self.valid_transforms = T.Compose([
-				T.Resize([256,256]),
-				T.ToTensor(),
-				normalize
-				])
-		else:
-			self.train_transforms = transforms[0]
-			self.valid_transforms = transforms[1]
-		
-	def __getitem__(self,index):
-		img_path = self.train_set[index]
-		'''关键的一步，根据路径和命名规则分离出标签，并转换相应的编号'''
-		label = self.labels.index(img_path.split('.'))
-		data = Image.open(img_path)
-		data = self.train_transforms(data)
-		return data,label
-
+	#concatenate the rest data as train_set
+	self.train_set = imgs[0:self.valid_start].extend(imgs[self.valid_end:])
+	
+	#if no transforms is given
+	if len(transforms) == 0:
+		self.train_transforms = T.Compose([
+			T.Resize([256,256]),
+			T.RandomCrop(32,padding=4),
+			T.RandomHorizontalFlip(),
+			T.ToTensor(),
+			normalize
+			])
+		self.valid_transforms = T.Compose([
+			T.Resize([256,256]),
+			T.ToTensor(),
+			normalize
+			])
+	else:
+		self.train_transforms = transforms[0]
+		self.valid_transforms = transforms[1]
+	
+def __getitem__(self,index):
+	img_path = self.train_set[index]
+	'''关键的一步，根据路径和命名规则分离出标签，并转换相应的编号'''
+	label = self.labels.index(img_path.split('.'))
+	data = Image.open(img_path)
+	data = self.train_transforms(data)
+	return data,label
+```
 
 对于图片数据集，pytorch有一个现成的API可以使用，它会自动读取形如：/train/label/ 的数据集，然后自动对各个label进行编号（从0开始）。
 
@@ -135,35 +135,35 @@ Parameters:
 + loader – A function to load an image given its path.
 
 一个简单的使用读取并分离出训练集和验证集的例子：
+```
+data_dir = #where your data dir locates
+'''训练集需要做增强处理，验证集不需要，但对两者原始样本的改动必须保持一直'''
+train_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=train_transform)
+valid_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=valid_transform)
 
-	data_dir = #where your data dir locates
-	'''训练集需要做增强处理，验证集不需要，但对两者原始样本的改动必须保持一直'''
-	train_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=train_transform)
-	valid_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=valid_transform)
-	
-	'''分类数目，标签可以直接查看classes这个属性'''
-	nclasses = len(train_dataset.classes)
-	num_train = len(train_dataset)#样本数
+'''分类数目，标签可以直接查看classes这个属性'''
+nclasses = len(train_dataset.classes)
+num_train = len(train_dataset)#样本数
 
-	'''构造训练集乱序索引，并根据指定的验证集比例大小，划分一部分索引子集作为验证集索引'''
-	indices = list(range(num_train))
-	split = int(np.floor(VALID_SIZE * num_train))
-	np.random.seed(0)
-	np.random.shuffle(indices)
-	train_idx, valid_idx = indices[split:], indices[:split]
+'''构造训练集乱序索引，并根据指定的验证集比例大小，划分一部分索引子集作为验证集索引'''
+indices = list(range(num_train))
+split = int(np.floor(VALID_SIZE * num_train))
+np.random.seed(0)
+np.random.shuffle(indices)
+train_idx, valid_idx = indices[split:], indices[:split]
 
-	'''这里用到了SubsetRandomSampler来根据传入的索引返回子集'''
-	train_sampler = Data.sampler.SubsetRandomSampler(train_idx)
-	valid_sampler = Data.sampler.SubsetRandomSampler(valid_idx)
+'''这里用到了SubsetRandomSampler来根据传入的索引返回子集'''
+train_sampler = Data.sampler.SubsetRandomSampler(train_idx)
+valid_sampler = Data.sampler.SubsetRandomSampler(valid_idx)
 
-	'''构造迭代器'''
-	train_loader = Data.DataLoader(train_dataset, 
-	                    batch_size=BATCH_SIZE,sampler=train_sampler,
-	                    num_workers=2, pin_memory=True,)
-	valid_loader = Data.DataLoader(valid_dataset, 
-	                    batch_size=BATCH_SIZE, sampler=valid_sampler, 
-	                    num_workers=2, pin_memory=True)
-
+'''构造迭代器'''
+train_loader = Data.DataLoader(train_dataset, 
+                    batch_size=BATCH_SIZE,sampler=train_sampler,
+                    num_workers=2, pin_memory=True,)
+valid_loader = Data.DataLoader(valid_dataset, 
+                    batch_size=BATCH_SIZE, sampler=valid_sampler, 
+                    num_workers=2, pin_memory=True)
+```
 #调用实现好的模型
 ResNet50
 
@@ -172,84 +172,82 @@ ResNet50
 一个默认参数pretrained表示是否使用预训练模型，也就是从指定URL下载已经训练好的模型参数。
 
 对应源码如下：
+```
+__all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
+           'resnet152']
 
-	__all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
-	           'resnet152']
 
-
-	model_urls = {
-	    'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
-	    'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
-	    'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
-	    'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
-	    'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
-	}
+model_urls = {
+    'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
+    'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
+    'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
+    'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
+    'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
+}
 ---
-	def resnet50(pretrained=False, **kwargs):
-	    """Constructs a ResNet-50 model.
+def resnet50(pretrained=False, **kwargs):
+    """Constructs a ResNet-50 model.
 
-	    Args:
-	        pretrained (bool): If True, returns a model pre-trained on ImageNet
-	    """
-	    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
-	    if pretrained:
-	        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
-	    return model
-
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+    """
+    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    if pretrained:
+        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+    return model
+```
 另一个则是关键字参数，在**model = ResNet(Bottleneck, [3, 4, 6, 3], \*\*kwargs)**这里会被传入。
 
 注意到
+```
+class ResNet(nn.Module):
 
-	class ResNet(nn.Module):
+    def __init__(self, block, layers, num_classes=1000):
+        self.inplanes = 64
+        super(ResNet, self).__init__()
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
+                               bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU(inplace=True)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.layer1 = self._make_layer(block, 64, layers[0])
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+        self.avgpool = nn.AvgPool2d(7, stride=1)
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
 
-	    def __init__(self, block, layers, num_classes=1000):
-	        self.inplanes = 64
-	        super(ResNet, self).__init__()
-	        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
-	                               bias=False)
-	        self.bn1 = nn.BatchNorm2d(64)
-	        self.relu = nn.ReLU(inplace=True)
-	        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-	        self.layer1 = self._make_layer(block, 64, layers[0])
-	        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-	        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-	        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-	        self.avgpool = nn.AvgPool2d(7, stride=1)
-	        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()```
 
-	        for m in self.modules():
-	            if isinstance(m, nn.Conv2d):
-	                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-	                m.weight.data.normal_(0, math.sqrt(2. / n))
-	            elif isinstance(m, nn.BatchNorm2d):
-	                m.weight.data.fill_(1)
-	                m.bias.data.zero_()
-
-**__init__()**函数中存在num_classes这个默认参数，因此我们可以通过\*\*kwargs这个关键字参数传递待分类的标签数目。比如我们希望num_classes=10，那么如此调用即可。
-
-	net = models.resnet50(num_classes=10)
+**__init__()**函数中存在**num_classes**这个默认参数，因此我们可以通过\*\*kwargs这个关键字参数传递待分类的标签数目。比如我们希望num_classes=10，那么如此调用即可。`net = models.resnet50(num_classes=10)`
 
 #分类任务中计算Accuracy
 在分类中一般使用**torch.max()**将网络的输出结果（标签向量）中预测概率最大的索引提取出来，并压榨(squeeze)成一维向量，然后统计正确率。
 另外需要注意的是，如果网络模型中包含dropout和batchnorm等只在训练中启用的层，那么需要使用net.eval()将网络模型转为测试模式以禁用他们，测试后再调用net.train()启用他们继续训练。
 
 一个简单的例子：
-
-	if step % 5 == 4:
-	 net.eval()
-	 correct = 0
-	 for _,(t_x,t_y) in enumerate(valid_loader):
-	     test_x = Variable(t_x).cuda()
-	     test_y = Variable(t_y).cuda()
-	     test_output = net(test_x)
-	     pred_y = torch.max(test_output,1)[1].cuda().data.squeeze()
-	     correct += torch.sum(pred_y == test_y.data)
-	 print("Epoch: %d Step: %d Loss: %f Accuracy: %f" % (epoch + 1,step + 1,running_loss/5,correct/split))
-	 running_loss = 0
-	 net.train()
-
+```
+if step % 5 == 4:
+ net.eval()
+ correct = 0
+ for _,(t_x,t_y) in enumerate(valid_loader):
+     test_x = Variable(t_x).cuda()
+     test_y = Variable(t_y).cuda()
+     test_output = net(test_x)
+     pred_y = torch.max(test_output,1)[1].cuda().data.squeeze()
+     correct += torch.sum(pred_y == test_y.data)
+ print("Epoch: %d Step: %d Loss: %f Accuracy: %f" % (epoch + 1,step + 1,running_loss/5,correct/split))
+ running_loss = 0
+ net.train()
+```
 #使用指定GPU
 使用编号为6，7的显卡：
-
-	import os
-	os.environ["CUDA_VISIBLE_DEVICES"] = "6,7"
+```
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "6,7"```
