@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="A Secret Garden">
 <meta property="og:description" content="Pytorch 这个框架确实用起来非常好用，有很多东西都封装好了。 以下是近来用到的几种方法和API。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-30T06:04:51.092Z">
+<meta property="og:updated_time" content="2018-01-30T07:36:27.389Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pytorch小总结">
 <meta name="twitter:description" content="Pytorch 这个框架确实用起来非常好用，有很多东西都封装好了。 以下是近来用到的几种方法和API。">
@@ -358,23 +358,7 @@
 <p>class torchvision.transforms.Compose(transforms)</p>
 </blockquote>
 <p>Parameters: transforms (list of Transform objects) – list of transforms to compose.</p>
-<p>一个简单的预处理例子：</p>
-<pre><code>normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-train_transform = transforms.Compose(
-    [
-     transforms.RandomCrop((224,224)),
-     transforms.ToTensor(),
-     normalize
-    ]
-)
-valid_transform = transforms.Compose(
-    [
-     transforms.Resize((224,224)),
-     transforms.ToTensor(),
-     normalize
-    ]
-)</code></pre>
+<p>一个简单的预处理例子： <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">normalize = transforms.Normalize(mean=[<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>],</span><br><span class="line">                                     std=[<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>])</span><br><span class="line">train_transform = transforms.Compose(</span><br><span class="line">    [</span><br><span class="line">     transforms.RandomCrop((<span class="number">224</span>,<span class="number">224</span>)),</span><br><span class="line">     transforms.ToTensor(),</span><br><span class="line">     normalize</span><br><span class="line">    ]</span><br><span class="line">)</span><br><span class="line">valid_transform = transforms.Compose(</span><br><span class="line">    [</span><br><span class="line">     transforms.Resize((<span class="number">224</span>,<span class="number">224</span>)),</span><br><span class="line">     transforms.ToTensor(),</span><br><span class="line">     normalize</span><br><span class="line">    ]</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
 <h1 id="数据读写">数据读写</h1>
 <p>最常用的就是继承<strong>torch.utils.data</strong>里面的</p>
 <blockquote>
@@ -400,63 +384,7 @@ valid_transform = transforms.Compose(
 <p>来封装成数据读取器用以批训练。一般可以使用<strong>enumerate()和iter()</strong>进行迭代循环。</p>
 <p>阅读源码不难发现，其实<strong>torch.utils.data.Dataset</strong>这个类初始化工作主要就是将数据文件的路径收集起来，然后其中的<strong><strong>getitem</strong>()</strong>根据收集的文件路径负责打开数据文件，并进行一系列的数据预处理。而<strong>torch.utils.data.DataLoader</strong>主要就是根据<strong>batch_size</strong>调用<strong><strong>getitem</strong>()</strong>。</p>
 <p>一个简单的自定义数据集例子：</p>
-<p><strong>这个例子是当初想自己实现分离训练集和验证集的代码，但是后来发现不那么好在一个dataset中分离，所以就弃坑了。代码并不能直接用，只是提供一个重写的思路。</strong></p>
-<pre><code>import torch
-import torch.utils.data as Data
-import torchvision.transforms as T
-import os
-import numpy as np
-from PIL import Image
-class ImageDataSet_Train(Data.Dataset):
-
-def __init__(self,root,transforms=[],valid_rate=0.1):
-    transforms_error_msg = &quot;either train_transforms &amp; valid_transforms, or nothing&quot;
-    valid_rate_error_msg = &quot;valid_rate should be in the range [0,1]&quot;
-    assert ((len(transforms)==0) or (len(transforms)==2)), transforms_error_msg
-    assert ((valid_size &gt;= 0) and (valid_size &lt;= 1)), valid_rate_error_msg
-    normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
-    # load train_data and then split it into train_set and valid_set according to valid_rate
-
-    label_folders = [os.path.join(root,img) for img in os.listdir(root)]
-    self.labels = [label.split(&#39;/&#39;)[-1] for label in label_folders]
-    imgs = [os.path.join(l,f) for l in label_folders for f in os.listdir(l)]
-    imgs = np.random.permutation(imgs)
-    set_size = len(imgs)
-    #calculate the size of valid_set and store the start and end index of valid_set[start,end)
-    split = np.floor(valid_rate*set_size)
-    self.valid_start = 0
-    self.valid_end = split
-    self.valid_set = imgs[self.valid_start:self.valid_end]
-    
-    #concatenate the rest data as train_set
-    self.train_set = imgs[0:self.valid_start].extend(imgs[self.valid_end:])
-    
-    #if no transforms is given
-    if len(transforms) == 0:
-        self.train_transforms = T.Compose([
-            T.Resize([256,256]),
-            T.RandomCrop(32,padding=4),
-            T.RandomHorizontalFlip(),
-            T.ToTensor(),
-            normalize
-            ])
-        self.valid_transforms = T.Compose([
-            T.Resize([256,256]),
-            T.ToTensor(),
-            normalize
-            ])
-    else:
-        self.train_transforms = transforms[0]
-        self.valid_transforms = transforms[1]
-    
-def __getitem__(self,index):
-    img_path = self.train_set[index]
-    &#39;&#39;&#39;关键的一步，根据路径和命名规则分离出标签，并转换相应的编号&#39;&#39;&#39;
-    label = self.labels.index(img_path.split(&#39;.&#39;))
-    data = Image.open(img_path)
-    data = self.train_transforms(data)
-    return data,label</code></pre>
+<p><strong>这个例子是当初想自己实现分离训练集和验证集的代码，但是后来发现不那么好在一个dataset中分离，所以就弃坑了。代码并不能直接用，只是提供一个重写的思路。</strong> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.utils.data <span class="keyword">as</span> Data</span><br><span class="line"><span class="keyword">import</span> torchvision.transforms <span class="keyword">as</span> T</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ImageDataSet_Train</span><span class="params">(Data.Dataset)</span>:</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,root,transforms=[],valid_rate=<span class="number">0.1</span>)</span>:</span></span><br><span class="line">	transforms_error_msg = <span class="string">"either train_transforms &amp; valid_transforms, or nothing"</span></span><br><span class="line">	valid_rate_error_msg = <span class="string">"valid_rate should be in the range [0,1]"</span></span><br><span class="line">	<span class="keyword">assert</span> ((len(transforms)==<span class="number">0</span>) <span class="keyword">or</span> (len(transforms)==<span class="number">2</span>)), transforms_error_msg</span><br><span class="line">	<span class="keyword">assert</span> ((valid_size &gt;= <span class="number">0</span>) <span class="keyword">and</span> (valid_size &lt;= <span class="number">1</span>)), valid_rate_error_msg</span><br><span class="line">	normalize = T.Normalize(mean=[<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>],</span><br><span class="line">                                 std=[<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>])</span><br><span class="line">	<span class="comment"># load train_data and then split it into train_set and valid_set according to valid_rate</span></span><br><span class="line"></span><br><span class="line">	label_folders = [os.path.join(root,img) <span class="keyword">for</span> img <span class="keyword">in</span> os.listdir(root)]</span><br><span class="line">	self.labels = [label.split(<span class="string">'/'</span>)[<span class="number">-1</span>] <span class="keyword">for</span> label <span class="keyword">in</span> label_folders]</span><br><span class="line">	imgs = [os.path.join(l,f) <span class="keyword">for</span> l <span class="keyword">in</span> label_folders <span class="keyword">for</span> f <span class="keyword">in</span> os.listdir(l)]</span><br><span class="line">	imgs = np.random.permutation(imgs)</span><br><span class="line">	set_size = len(imgs)</span><br><span class="line">	<span class="comment">#calculate the size of valid_set and store the start and end index of valid_set[start,end)</span></span><br><span class="line">	split = np.floor(valid_rate*set_size)</span><br><span class="line">	self.valid_start = <span class="number">0</span></span><br><span class="line">	self.valid_end = split</span><br><span class="line">	self.valid_set = imgs[self.valid_start:self.valid_end]</span><br><span class="line">	</span><br><span class="line">	<span class="comment">#concatenate the rest data as train_set</span></span><br><span class="line">	self.train_set = imgs[<span class="number">0</span>:self.valid_start].extend(imgs[self.valid_end:])</span><br><span class="line">	</span><br><span class="line">	<span class="comment">#if no transforms is given</span></span><br><span class="line">	<span class="keyword">if</span> len(transforms) == <span class="number">0</span>:</span><br><span class="line">		self.train_transforms = T.Compose([</span><br><span class="line">			T.Resize([<span class="number">256</span>,<span class="number">256</span>]),</span><br><span class="line">			T.RandomCrop(<span class="number">32</span>,padding=<span class="number">4</span>),</span><br><span class="line">			T.RandomHorizontalFlip(),</span><br><span class="line">			T.ToTensor(),</span><br><span class="line">			normalize</span><br><span class="line">			])</span><br><span class="line">		self.valid_transforms = T.Compose([</span><br><span class="line">			T.Resize([<span class="number">256</span>,<span class="number">256</span>]),</span><br><span class="line">			T.ToTensor(),</span><br><span class="line">			normalize</span><br><span class="line">			])</span><br><span class="line">	<span class="keyword">else</span>:</span><br><span class="line">		self.train_transforms = transforms[<span class="number">0</span>]</span><br><span class="line">		self.valid_transforms = transforms[<span class="number">1</span>]</span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self,index)</span>:</span></span><br><span class="line">	img_path = self.train_set[index]</span><br><span class="line">	<span class="string">'''关键的一步，根据路径和命名规则分离出标签，并转换相应的编号'''</span></span><br><span class="line">	label = self.labels.index(img_path.split(<span class="string">'.'</span>))</span><br><span class="line">	data = Image.open(img_path)</span><br><span class="line">	data = self.train_transforms(data)</span><br><span class="line">	<span class="keyword">return</span> data,label</span><br></pre></td></tr></table></figure></p>
 <p>对于图片数据集，pytorch有一个现成的API可以使用，它会自动读取形如：/train/label/ 的数据集，然后自动对各个label进行编号（从0开始）。</p>
 <blockquote>
 <p>class torchvision.datasets.ImageFolder(root, transform=None, target_transform=None, loader=<function default_loader="">)</function></p>
@@ -468,110 +396,22 @@ def __getitem__(self,index):
 <li>target_transform (callable, optional) – A function/transform that takes in the target and transforms it.</li>
 <li>loader – A function to load an image given its path.</li>
 </ul>
-<p>一个简单的使用读取并分离出训练集和验证集的例子：</p>
-<pre><code>data_dir = #where your data dir locates
-&#39;&#39;&#39;训练集需要做增强处理，验证集不需要，但对两者原始样本的改动必须保持一直&#39;&#39;&#39;
-train_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=train_transform)
-valid_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=valid_transform)
-
-&#39;&#39;&#39;分类数目，标签可以直接查看classes这个属性&#39;&#39;&#39;
-nclasses = len(train_dataset.classes)
-num_train = len(train_dataset)#样本数
-
-&#39;&#39;&#39;构造训练集乱序索引，并根据指定的验证集比例大小，划分一部分索引子集作为验证集索引&#39;&#39;&#39;
-indices = list(range(num_train))
-split = int(np.floor(VALID_SIZE * num_train))
-np.random.seed(0)
-np.random.shuffle(indices)
-train_idx, valid_idx = indices[split:], indices[:split]
-
-&#39;&#39;&#39;这里用到了SubsetRandomSampler来根据传入的索引返回子集&#39;&#39;&#39;
-train_sampler = Data.sampler.SubsetRandomSampler(train_idx)
-valid_sampler = Data.sampler.SubsetRandomSampler(valid_idx)
-
-&#39;&#39;&#39;构造迭代器&#39;&#39;&#39;
-train_loader = Data.DataLoader(train_dataset, 
-                    batch_size=BATCH_SIZE,sampler=train_sampler,
-                    num_workers=2, pin_memory=True,)
-valid_loader = Data.DataLoader(valid_dataset, 
-                    batch_size=BATCH_SIZE, sampler=valid_sampler, 
-                    num_workers=2, pin_memory=True)</code></pre>
+<p>一个简单的使用读取并分离出训练集和验证集的例子： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">data_dir = <span class="comment">#where your data dir locates</span></span><br><span class="line"><span class="string">'''训练集需要做增强处理，验证集不需要，但对两者原始样本的改动必须保持一直'''</span></span><br><span class="line">train_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=train_transform)</span><br><span class="line">valid_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=valid_transform)</span><br><span class="line"></span><br><span class="line"><span class="string">'''分类数目，标签可以直接查看classes这个属性'''</span></span><br><span class="line">nclasses = len(train_dataset.classes)</span><br><span class="line">num_train = len(train_dataset)<span class="comment">#样本数</span></span><br><span class="line"></span><br><span class="line"><span class="string">'''构造训练集乱序索引，并根据指定的验证集比例大小，划分一部分索引子集作为验证集索引'''</span></span><br><span class="line">indices = list(range(num_train))</span><br><span class="line">split = int(np.floor(VALID_SIZE * num_train))</span><br><span class="line">np.random.seed(<span class="number">0</span>)</span><br><span class="line">np.random.shuffle(indices)</span><br><span class="line">train_idx, valid_idx = indices[split:], indices[:split]</span><br><span class="line"></span><br><span class="line"><span class="string">'''这里用到了SubsetRandomSampler来根据传入的索引返回子集'''</span></span><br><span class="line">train_sampler = Data.sampler.SubsetRandomSampler(train_idx)</span><br><span class="line">valid_sampler = Data.sampler.SubsetRandomSampler(valid_idx)</span><br><span class="line"></span><br><span class="line"><span class="string">'''构造迭代器'''</span></span><br><span class="line">train_loader = Data.DataLoader(train_dataset, </span><br><span class="line">                    batch_size=BATCH_SIZE,sampler=train_sampler,</span><br><span class="line">                    num_workers=<span class="number">2</span>, pin_memory=<span class="keyword">True</span>,)</span><br><span class="line">valid_loader = Data.DataLoader(valid_dataset, </span><br><span class="line">                    batch_size=BATCH_SIZE, sampler=valid_sampler, </span><br><span class="line">                    num_workers=<span class="number">2</span>, pin_memory=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure></p>
 <h1 id="调用实现好的模型">调用实现好的模型</h1>
 <p>ResNet50</p>
 <blockquote>
 <p>torchvision.models.resnet50(pretrained=False, **kwargs)</p>
 </blockquote>
 <p>一个默认参数pretrained表示是否使用预训练模型，也就是从指定URL下载已经训练好的模型参数。</p>
-<p>对应源码如下：</p>
-<pre><code>__all__ = [&#39;ResNet&#39;, &#39;resnet18&#39;, &#39;resnet34&#39;, &#39;resnet50&#39;, &#39;resnet101&#39;,
-           &#39;resnet152&#39;]
-
-
-model_urls = {
-    &#39;resnet18&#39;: &#39;https://download.pytorch.org/models/resnet18-5c106cde.pth&#39;,
-    &#39;resnet34&#39;: &#39;https://download.pytorch.org/models/resnet34-333f7ec4.pth&#39;,
-    &#39;resnet50&#39;: &#39;https://download.pytorch.org/models/resnet50-19c8e357.pth&#39;,
-    &#39;resnet101&#39;: &#39;https://download.pytorch.org/models/resnet101-5d3b4d8f.pth&#39;,
-    &#39;resnet152&#39;: &#39;https://download.pytorch.org/models/resnet152-b121ed2d.pth&#39;,
-}</code></pre>
-<hr>
-<pre><code>def resnet50(pretrained=False, **kwargs):
-    &quot;&quot;&quot;Constructs a ResNet-50 model.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    &quot;&quot;&quot;
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls[&#39;resnet50&#39;]))
-    return model</code></pre>
+<p>对应源码如下： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">__all__ = [<span class="string">'ResNet'</span>, <span class="string">'resnet18'</span>, <span class="string">'resnet34'</span>, <span class="string">'resnet50'</span>, <span class="string">'resnet101'</span>,</span><br><span class="line">           <span class="string">'resnet152'</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">model_urls = &#123;</span><br><span class="line">    <span class="string">'resnet18'</span>: <span class="string">'https://download.pytorch.org/models/resnet18-5c106cde.pth'</span>,</span><br><span class="line">    <span class="string">'resnet34'</span>: <span class="string">'https://download.pytorch.org/models/resnet34-333f7ec4.pth'</span>,</span><br><span class="line">    <span class="string">'resnet50'</span>: <span class="string">'https://download.pytorch.org/models/resnet50-19c8e357.pth'</span>,</span><br><span class="line">    <span class="string">'resnet101'</span>: <span class="string">'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth'</span>,</span><br><span class="line">    <span class="string">'resnet152'</span>: <span class="string">'https://download.pytorch.org/models/resnet152-b121ed2d.pth'</span>,</span><br><span class="line">&#125;</span><br><span class="line">---</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">resnet50</span><span class="params">(pretrained=False, **kwargs)</span>:</span></span><br><span class="line">    <span class="string">"""Constructs a ResNet-50 model.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        pretrained (bool): If True, returns a model pre-trained on ImageNet</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    model = ResNet(Bottleneck, [<span class="number">3</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">3</span>], **kwargs)</span><br><span class="line">    <span class="keyword">if</span> pretrained:</span><br><span class="line">        model.load_state_dict(model_zoo.load_url(model_urls[<span class="string">'resnet50'</span>]))</span><br><span class="line">    <span class="keyword">return</span> model</span><br></pre></td></tr></table></figure></p>
 <p>另一个则是关键字参数，在<strong>model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)</strong>这里会被传入。</p>
-<p>注意到</p>
-<pre><code>class ResNet(nn.Module):
-
-    def __init__(self, block, layers, num_classes=1000):
-        self.inplanes = 64
-        super(ResNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
-                               bias=False)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
-
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
-            elif isinstance(m, nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()</code></pre>
-<p><strong><strong>init</strong>()</strong>函数中存在num_classes这个默认参数，因此我们可以通过**kwargs这个关键字参数传递待分类的标签数目。比如我们希望num_classes=10，那么如此调用即可。</p>
-<pre><code>net = models.resnet50(num_classes=10)</code></pre>
+<p>注意到 <figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">class</span> ResNet(nn.Module):</span><br><span class="line"></span><br><span class="line">    def __init__(<span class="keyword">self, </span><span class="keyword">block, </span>layers, num_classes<span class="number">=1000</span>):</span><br><span class="line">        <span class="keyword">self.inplanes </span>= <span class="number">64</span></span><br><span class="line">        super(ResNet, <span class="keyword">self).__init__()</span></span><br><span class="line"><span class="keyword"> </span>       <span class="keyword">self.conv1 </span>= nn.Conv2d(<span class="number">3</span>, <span class="number">64</span>, kernel_size<span class="number">=7</span>, <span class="keyword">stride=2, </span>padding<span class="number">=3</span>,</span><br><span class="line">                               <span class="keyword">bias=False)</span></span><br><span class="line"><span class="keyword"> </span>       <span class="keyword">self.bn1 </span>= nn.<span class="keyword">BatchNorm2d(64)</span></span><br><span class="line"><span class="keyword"> </span>       <span class="keyword">self.relu </span>= nn.ReLU(inplace<span class="symbol">=True</span>)</span><br><span class="line">        <span class="keyword">self.maxpool </span>= nn.MaxPool2d(kernel_size<span class="number">=3</span>, <span class="keyword">stride=2, </span>padding<span class="number">=1</span>)</span><br><span class="line">        <span class="keyword">self.layer1 </span>= <span class="keyword">self._make_layer(block, </span><span class="number">64</span>, layers[<span class="number">0</span>])</span><br><span class="line">        <span class="keyword">self.layer2 </span>= <span class="keyword">self._make_layer(block, </span><span class="number">128</span>, layers[<span class="number">1</span>], <span class="keyword">stride=2)</span></span><br><span class="line"><span class="keyword"> </span>       <span class="keyword">self.layer3 </span>= <span class="keyword">self._make_layer(block, </span><span class="number">256</span>, layers[<span class="number">2</span>], <span class="keyword">stride=2)</span></span><br><span class="line"><span class="keyword"> </span>       <span class="keyword">self.layer4 </span>= <span class="keyword">self._make_layer(block, </span><span class="number">512</span>, layers[<span class="number">3</span>], <span class="keyword">stride=2)</span></span><br><span class="line"><span class="keyword"> </span>       <span class="keyword">self.avgpool </span>= nn.AvgPool2d(<span class="number">7</span>, <span class="keyword">stride=1)</span></span><br><span class="line"><span class="keyword"> </span>       <span class="keyword">self.fc </span>= nn.Linear(<span class="number">512</span> * <span class="keyword">block.expansion, </span>num_classes)</span><br><span class="line"></span><br><span class="line">        for m in <span class="keyword">self.modules():</span></span><br><span class="line"><span class="keyword"> </span>           <span class="meta">if</span> isinstance(m, nn.Conv2d):</span><br><span class="line">                n = m.kernel_size[<span class="number">0</span>] * m.kernel_size[<span class="number">1</span>] * m.out_channels</span><br><span class="line">                m.weight<span class="meta">.data</span>.normal_(<span class="number">0</span>, math.sqrt(<span class="number">2</span>. / n))</span><br><span class="line">            <span class="meta">elif</span> isinstance(m, nn.<span class="keyword">BatchNorm2d):</span></span><br><span class="line"><span class="keyword"> </span>               m.weight<span class="meta">.data</span>.fill_(<span class="number">1</span>)</span><br><span class="line">                m.<span class="keyword">bias.data.zero_()</span></span><br></pre></td></tr></table></figure></p>
+<p><strong><strong>init</strong>()</strong>函数中存在<strong>num_classes</strong>这个默认参数，因此我们可以通过**kwargs这个关键字参数传递待分类的标签数目。比如我们希望num_classes=10，那么如此调用即可。<code>net = models.resnet50(num_classes=10)</code></p>
 <h1 id="分类任务中计算accuracy">分类任务中计算Accuracy</h1>
 <p>在分类中一般使用<strong>torch.max()</strong>将网络的输出结果（标签向量）中预测概率最大的索引提取出来，并压榨(squeeze)成一维向量，然后统计正确率。 另外需要注意的是，如果网络模型中包含dropout和batchnorm等只在训练中启用的层，那么需要使用net.eval()将网络模型转为测试模式以禁用他们，测试后再调用net.train()启用他们继续训练。</p>
-<p>一个简单的例子：</p>
-<pre><code>if step % 5 == 4:
- net.eval()
- correct = 0
- for _,(t_x,t_y) in enumerate(valid_loader):
-     test_x = Variable(t_x).cuda()
-     test_y = Variable(t_y).cuda()
-     test_output = net(test_x)
-     pred_y = torch.max(test_output,1)[1].cuda().data.squeeze()
-     correct += torch.sum(pred_y == test_y.data)
- print(&quot;Epoch: %d Step: %d Loss: %f Accuracy: %f&quot; % (epoch + 1,step + 1,running_loss/5,correct/split))
- running_loss = 0
- net.train()</code></pre>
+<p>一个简单的例子： <figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">step</span> <span class="symbol">%</span> <span class="number">5</span> == <span class="number">4</span>:</span><br><span class="line"> net.<span class="built_in">eval</span>()</span><br><span class="line"> correct = <span class="number">0</span></span><br><span class="line"> <span class="keyword">for</span> <span class="symbol">_</span>,(t_x,t_y) <span class="keyword">in</span> enumerate(valid_loader):</span><br><span class="line">     test_x = Variable(t_x).cuda()</span><br><span class="line">     test_y = Variable(t_y).cuda()</span><br><span class="line">     test_output = net(test_x)</span><br><span class="line">     pred_y = torch.<span class="built_in">max</span>(test_output,<span class="number">1</span>)[<span class="number">1</span>].cuda().data.squeeze()</span><br><span class="line">     correct += torch.<span class="built_in">sum</span>(pred_y == test_y.data)</span><br><span class="line"> <span class="built_in">print</span>(<span class="string">"Epoch: %d Step: %d Loss: %f Accuracy: %f"</span> <span class="symbol">%</span> (epoch + <span class="number">1</span>,<span class="keyword">step</span> + <span class="number">1</span>,running_loss/<span class="number">5</span>,correct/<span class="built_in">split</span>))</span><br><span class="line"> running_loss = <span class="number">0</span></span><br><span class="line"> net.train()</span><br></pre></td></tr></table></figure></p>
 <h1 id="使用指定gpu">使用指定GPU</h1>
-<p>使用编号为6，7的显卡：</p>
-<pre><code>import os
-os.environ[&quot;CUDA_VISIBLE_DEVICES&quot;] = &quot;6,7&quot;</code></pre>
+<p>使用编号为6，7的显卡： <figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="built_in">os</span></span><br><span class="line"><span class="built_in">os</span>.environ[<span class="string">"CUDA_VISIBLE_DEVICES"</span>] = <span class="string">"6,7"</span></span><br></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -611,6 +451,10 @@ os.environ[&quot;CUDA_VISIBLE_DEVICES&quot;] = &quot;6,7&quot;</code></pre>
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/30/pytorch-nn-nn-functional/" rel="prev" title="pytorch中nn&nn.functional的设计机制">
+                pytorch中nn&nn.functional的设计机制 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -717,7 +561,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

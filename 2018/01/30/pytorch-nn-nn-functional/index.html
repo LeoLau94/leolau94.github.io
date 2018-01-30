@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Pytorch 这个框架确实用起来非常好用，有很多东西都封装好了。 以下是近来用到的几种方法和API。">
+<meta name="description" content="之前对torch.nn中已经封装成类的层，却在nn.functional中又提供以函数的形式进行调用的接口，感到十分不解。后来看了源码后才明白Pytorch如此设计的精妙之处。">
 <meta name="keywords" content="pytorch">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pytorch小总结">
-<meta property="og:url" content="https://leolau94.github.io/2018/01/30/something-about-pytorch-mxnet/index.html">
+<meta property="og:title" content="pytorch中nn&amp;nn.functional的设计机制">
+<meta property="og:url" content="https://leolau94.github.io/2018/01/30/pytorch-nn-nn-functional/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="Pytorch 这个框架确实用起来非常好用，有很多东西都封装好了。 以下是近来用到的几种方法和API。">
+<meta property="og:description" content="之前对torch.nn中已经封装成类的层，却在nn.functional中又提供以函数的形式进行调用的接口，感到十分不解。后来看了源码后才明白Pytorch如此设计的精妙之处。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-30T05:24:24.235Z">
+<meta property="og:updated_time" content="2018-01-30T08:07:00.085Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pytorch小总结">
-<meta name="twitter:description" content="Pytorch 这个框架确实用起来非常好用，有很多东西都封装好了。 以下是近来用到的几种方法和API。">
+<meta name="twitter:title" content="pytorch中nn&amp;nn.functional的设计机制">
+<meta name="twitter:description" content="之前对torch.nn中已经封装成类的层，却在nn.functional中又提供以函数的形式进行调用的接口，感到十分不解。后来看了源码后才明白Pytorch如此设计的精妙之处。">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://leolau94.github.io/2018/01/30/something-about-pytorch-mxnet/"/>
+  <link rel="canonical" href="https://leolau94.github.io/2018/01/30/pytorch-nn-nn-functional/"/>
 
 
 
 
 
-  <title>pytorch小总结 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title>pytorch中nn&nn.functional的设计机制 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
   
 
 
@@ -263,7 +263,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/01/30/something-about-pytorch-mxnet/">
+    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/01/30/pytorch-nn-nn-functional/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Leo Lau">
@@ -280,7 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">pytorch小总结</h1>
+          <h1 class="post-title" itemprop="name headline">pytorch中nn&nn.functional的设计机制</h1>
         
 
         <div class="post-meta">
@@ -292,7 +292,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-30T10:15:44+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-30T15:22:25+08:00">
                 2018-01-30
               </time>
             
@@ -352,222 +352,20 @@
       
 
       
-        <h1 id="pytorch">Pytorch</h1>
-<p>这个框架确实用起来非常好用，有很多东西都封装好了。 以下是近来用到的几种方法和API。 <a id="more"></a> #数据预处理 对于数据的预处理主要用到<strong>torchvision.transforms</strong>这里面的函数，其中一个很方便的，构造预处理拓扑的方式是调用</p>
+        <p>之前对torch.nn中已经封装成类的层，却在nn.functional中又提供以函数的形式进行调用的接口，感到十分不解。后来看了源码后才明白Pytorch如此设计的精妙之处。 <a id="more"></a></p>
+<h1 id="使用的设计机制">使用的设计机制</h1>
+<p>以官方文档中的教程为例子： <figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line">from torch.autograd import Variable</span><br><span class="line">import torch.nn as nn</span><br><span class="line">import torch.nn.functional as F</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Net</span>(<span class="title">nn</span>.<span class="title">Module</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(<span class="keyword">self</span>)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">super</span>(Net, <span class="keyword">self</span>).__init_<span class="number">_</span>()</span><br><span class="line">        <span class="comment"># 1 input image channel, 6 output channels, 5x5 square convolution</span></span><br><span class="line">        <span class="comment"># kernel</span></span><br><span class="line">        <span class="keyword">self</span>.conv1 = nn.Conv2d(<span class="number">1</span>, <span class="number">6</span>, <span class="number">5</span>)</span><br><span class="line">        <span class="keyword">self</span>.conv2 = nn.Conv2d(<span class="number">6</span>, <span class="number">16</span>, <span class="number">5</span>)</span><br><span class="line">        <span class="comment"># an affine operation: y = Wx + b</span></span><br><span class="line">        <span class="keyword">self</span>.fc1 = nn.Linear(<span class="number">16</span> * <span class="number">5</span> * <span class="number">5</span>, <span class="number">120</span>)</span><br><span class="line">        <span class="keyword">self</span>.fc2 = nn.Linear(<span class="number">120</span>, <span class="number">84</span>)</span><br><span class="line">        <span class="keyword">self</span>.fc3 = nn.Linear(<span class="number">84</span>, <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(<span class="keyword">self</span>, x)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="comment"># Max pooling over a (2, 2) window</span></span><br><span class="line">        x = F.max_pool2d(F.relu(<span class="keyword">self</span>.conv1(x)), (<span class="number">2</span>, <span class="number">2</span>))</span><br><span class="line">        <span class="comment"># If the size is a square you can only specify a single number</span></span><br><span class="line">        x = F.max_pool2d(F.relu(<span class="keyword">self</span>.conv2(x)), <span class="number">2</span>)</span><br><span class="line">        x = x.view(-<span class="number">1</span>, <span class="keyword">self</span>.num_flat_features(x))</span><br><span class="line">        x = F.relu(<span class="keyword">self</span>.fc1(x))</span><br><span class="line">        x = F.relu(<span class="keyword">self</span>.fc2(x))</span><br><span class="line">        x = <span class="keyword">self</span>.fc3(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">num_flat_features</span><span class="params">(<span class="keyword">self</span>, x)</span></span><span class="symbol">:</span></span><br><span class="line">        size = x.size()[<span class="number">1</span><span class="symbol">:</span>]  <span class="comment"># all dimensions except the batch dimension</span></span><br><span class="line">        num_features = <span class="number">1</span></span><br><span class="line">        <span class="keyword">for</span> s <span class="keyword">in</span> <span class="symbol">size:</span></span><br><span class="line">            num_features *= s</span><br><span class="line">        <span class="keyword">return</span> num_features</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">net = Net()</span><br><span class="line">print(net)</span><br></pre></td></tr></table></figure></p>
+<p>注意到其中的语句<strong><code>x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))</code></strong>和<strong>x = F.relu(self.fc1(x))</strong>实现的是MaxPool2d层和ReLU层的功能。</p>
+<p>查看<strong>nn.MaxPool2d</strong>源码 <figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MaxPool2d</span>(<span class="title">Module</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(<span class="keyword">self</span>, kernel_size, stride=None, padding=<span class="number">0</span>, dilation=<span class="number">1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 return_indices=False, ceil_mode=False)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">super</span>(MaxPool2d, <span class="keyword">self</span>).__init_<span class="number">_</span>()</span><br><span class="line">        <span class="keyword">self</span>.kernel_size = kernel_size</span><br><span class="line">        <span class="keyword">self</span>.stride = stride <span class="keyword">or</span> kernel_size</span><br><span class="line">        <span class="keyword">self</span>.padding = padding</span><br><span class="line">        <span class="keyword">self</span>.dilation = dilation</span><br><span class="line">        <span class="keyword">self</span>.return_indices = return_indices</span><br><span class="line">        <span class="keyword">self</span>.ceil_mode = ceil_mode</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(<span class="keyword">self</span>, input)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">return</span> F.max_pool2d(input, <span class="keyword">self</span>.kernel_size, <span class="keyword">self</span>.stride,</span><br><span class="line">                            <span class="keyword">self</span>.padding, <span class="keyword">self</span>.dilation, <span class="keyword">self</span>.ceil_mode,</span><br><span class="line">                            <span class="keyword">self</span>.return_indices)</span><br></pre></td></tr></table></figure></p>
+<p>可以发现，其实<strong>nn.MaxPool2d</strong>层的<strong>forward</strong>函数就是调用的<strong>F.max_pool2d</strong>。类似的可以发现，其他种类的层，也是采取这样的机制。</p>
+<h1 id="那么为什么要这样设计呢">那么为什么要这样设计呢？</h1>
+<p>根据网上搜索到的说法，主要的原因就是为了兼顾网络模型定义时的<strong>灵活性</strong>和<strong>便利性</strong></p>
 <blockquote>
-<p>class torchvision.transforms.Compose(transforms)</p>
+<p>在建图过程中，往往有两种层，一种如全连接层，卷积层等，当中有Variable，另一种如Pooling层，Relu层等，当中没有Variable。 如果所有的层都用nn.functional来定义，那么所有的Variable，如weights，bias等，都需要用户来手动定义，非常不方便。 而如果所有的层都换成nn来定义，那么即便是简单的计算都需要建类来做，而这些可以用更为简单的函数来代替的。 所以在定义网络的时候，如果层内有Variable,那么用nn定义，反之，则用nn.functional定义。</p>
 </blockquote>
-<p>Parameters: transforms (list of Transform objects) – list of transforms to compose.</p>
-<p>一个简单的预处理例子：</p>
-<pre><code>normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-train_transform = transforms.Compose(
-    [
-     transforms.RandomCrop((224,224)),
-     transforms.ToTensor(),
-     normalize
-    ]
-)
-valid_transform = transforms.Compose(
-    [
-     transforms.Resize((224,224)),
-     transforms.ToTensor(),
-     normalize
-    ]
-)</code></pre>
-<h1 id="数据读写">数据读写</h1>
-<p>最常用的就是继承<strong>torch.utils.data</strong>里面的</p>
 <blockquote>
-<p>class torch.utils.data.Dataset</p>
+<p>转自：<a href="http://blog.csdn.net/GZHermit/article/details/78730856" target="_blank" rel="noopener">CSDN</a></p>
 </blockquote>
-<p>这个类，并且重写其中的**<strong>len</strong>()和__getitem__()**这个两个函数</p>
-<p>然后使用</p>
-<blockquote>
-<p>class torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, sampler=None, batch_sampler=None, num_workers=0, collate_fn=<function default_collate="">, pin_memory=False, drop_last=False)</function></p>
-</blockquote>
-<p>Parameters:</p>
-<ul>
-<li>dataset (Dataset) – dataset from which to load the data.</li>
-<li>batch_size (int, optional) – how many samples per batch to load (default: 1).</li>
-<li>shuffle (bool, optional) – set to True to have the data reshuffled at every epoch (default: False).</li>
-<li>sampler (Sampler, optional) – defines the strategy to draw samples from the dataset. If specified, shuffle must be False.</li>
-<li>batch_sampler (Sampler, optional) – like sampler, but returns a batch of indices at a time. Mutually exclusive with batch_size, shuffle, sampler, and drop_last.</li>
-<li>num_workers (int, optional) – how many subprocesses to use for data loading. 0 means that the data will be loaded in the main process (default: 0)</li>
-<li>collate_fn (callable, optional) – merges a list of samples to form a mini-batch.</li>
-<li>pin_memory (bool, optional) – If True, the data loader will copy tensors into CUDA pinned memory before returning them.</li>
-<li>drop_last (bool, optional) – set to True to drop the last incomplete batch, if the dataset size is not divisible by the batch size. If False and the size of dataset is not divisible by the batch size, then the last batch will be smaller. (default: False)</li>
-</ul>
-<p>来封装成数据读取器用以批训练。一般可以使用<strong>enumerate()和iter()</strong>进行迭代循环。</p>
-<p>阅读源码不难发现，其实<strong>torch.utils.data.Dataset</strong>这个类初始化工作主要就是将数据文件的路径收集起来，然后其中的<strong><strong>getitem</strong>()</strong>根据收集的文件路径负责打开数据文件，并进行一系列的数据预处理。而<strong>torch.utils.data.DataLoader</strong>主要就是根据<strong>batch_size</strong>调用<strong><strong>getitem</strong>()</strong>。</p>
-<p>一个简单的自定义数据集例子：</p>
-<p><strong>这个例子是当初想自己实现分离训练集和验证集的代码，但是后来发现不那么好在一个dataset中分离，所以就弃坑了。代码并不能直接用，只是提供一个重写的思路。</strong></p>
-<pre><code>import torch
-import torch.utils.data as Data
-import torchvision.transforms as T
-import os
-import numpy as np
-from PIL import Image
-class ImageDataSet_Train(Data.Dataset):
-
-def __init__(self,root,transforms=[],valid_rate=0.1):
-    transforms_error_msg = &quot;either train_transforms &amp; valid_transforms, or nothing&quot;
-    valid_rate_error_msg = &quot;valid_rate should be in the range [0,1]&quot;
-    assert ((len(transforms)==0) or (len(transforms)==2)), transforms_error_msg
-    assert ((valid_size &gt;= 0) and (valid_size &lt;= 1)), valid_rate_error_msg
-    normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
-    # load train_data and then split it into train_set and valid_set according to valid_rate
-
-    label_folders = [os.path.join(root,img) for img in os.listdir(root)]
-    self.labels = [label.split(&#39;/&#39;)[-1] for label in label_folders]
-    imgs = [os.path.join(l,f) for l in label_folders for f in os.listdir(l)]
-    imgs = np.random.permutation(imgs)
-    set_size = len(imgs)
-    #calculate the size of valid_set and store the start and end index of valid_set[start,end)
-    split = np.floor(valid_rate*set_size)
-    self.valid_start = 0
-    self.valid_end = split
-    self.valid_set = imgs[self.valid_start:self.valid_end]
-    
-    #concatenate the rest data as train_set
-    self.train_set = imgs[0:self.valid_start].extend(imgs[self.valid_end:])
-    
-    #if no transforms is given
-    if len(transforms) == 0:
-        self.train_transforms = T.Compose([
-            T.Resize([256,256]),
-            T.RandomCrop(32,padding=4),
-            T.RandomHorizontalFlip(),
-            T.ToTensor(),
-            normalize
-            ])
-        self.valid_transforms = T.Compose([
-            T.Resize([256,256]),
-            T.ToTensor(),
-            normalize
-            ])
-    else:
-        self.train_transforms = transforms[0]
-        self.valid_transforms = transforms[1]
-    
-def __getitem__(self,index):
-    img_path = self.train_set[index]
-    &#39;&#39;&#39;关键的一步，根据路径和命名规则分离出标签，并转换相应的编号&#39;&#39;&#39;
-    label = self.labels.index(img_path.split(&#39;.&#39;))
-    data = Image.open(img_path)
-    data = self.train_transforms(data)
-    return data,label</code></pre>
-<p>对于图片数据集，pytorch有一个现成的API可以使用，它会自动读取形如：/train/label/ 的数据集，然后自动对各个label进行编号（从0开始）。</p>
-<blockquote>
-<p>class torchvision.datasets.ImageFolder(root, transform=None, target_transform=None, loader=<function default_loader="">)</function></p>
-</blockquote>
-<p>Parameters:</p>
-<ul>
-<li>root (string) – Root directory path.</li>
-<li>transform (callable, optional) – A function/transform that takes in an PIL image and returns a transformed version. E.g, transforms.RandomCrop</li>
-<li>target_transform (callable, optional) – A function/transform that takes in the target and transforms it.</li>
-<li>loader – A function to load an image given its path.</li>
-</ul>
-<p>一个简单的使用读取并分离出训练集和验证集的例子：</p>
-<pre><code>data_dir = #where your data dir locates
-&#39;&#39;&#39;训练集需要做增强处理，验证集不需要，但对两者原始样本的改动必须保持一直&#39;&#39;&#39;
-train_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=train_transform)
-valid_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=valid_transform)
-
-&#39;&#39;&#39;分类数目，标签可以直接查看classes这个属性&#39;&#39;&#39;
-nclasses = len(train_dataset.classes)
-num_train = len(train_dataset)#样本数
-
-&#39;&#39;&#39;构造训练集乱序索引，并根据指定的验证集比例大小，划分一部分索引子集作为验证集索引&#39;&#39;&#39;
-indices = list(range(num_train))
-split = int(np.floor(VALID_SIZE * num_train))
-np.random.seed(0)
-np.random.shuffle(indices)
-train_idx, valid_idx = indices[split:], indices[:split]
-
-&#39;&#39;&#39;这里用到了SubsetRandomSampler来根据传入的索引返回子集&#39;&#39;&#39;
-train_sampler = Data.sampler.SubsetRandomSampler(train_idx)
-valid_sampler = Data.sampler.SubsetRandomSampler(valid_idx)
-
-&#39;&#39;&#39;构造迭代器&#39;&#39;&#39;
-train_loader = Data.DataLoader(train_dataset, 
-                    batch_size=BATCH_SIZE,sampler=train_sampler,
-                    num_workers=2, pin_memory=True,)
-valid_loader = Data.DataLoader(valid_dataset, 
-                    batch_size=BATCH_SIZE, sampler=valid_sampler, 
-                    num_workers=2, pin_memory=True)</code></pre>
-<h1 id="调用实现好的模型">调用实现好的模型</h1>
-<p>ResNet50</p>
-<blockquote>
-<p>torchvision.models.resnet50(pretrained=False, **kwargs)</p>
-</blockquote>
-<p>一个默认参数pretrained表示是否使用预训练模型，也就是从指定URL下载已经训练好的模型参数。</p>
-<p>对应源码如下：</p>
-<pre><code>__all__ = [&#39;ResNet&#39;, &#39;resnet18&#39;, &#39;resnet34&#39;, &#39;resnet50&#39;, &#39;resnet101&#39;,
-           &#39;resnet152&#39;]
-
-
-model_urls = {
-    &#39;resnet18&#39;: &#39;https://download.pytorch.org/models/resnet18-5c106cde.pth&#39;,
-    &#39;resnet34&#39;: &#39;https://download.pytorch.org/models/resnet34-333f7ec4.pth&#39;,
-    &#39;resnet50&#39;: &#39;https://download.pytorch.org/models/resnet50-19c8e357.pth&#39;,
-    &#39;resnet101&#39;: &#39;https://download.pytorch.org/models/resnet101-5d3b4d8f.pth&#39;,
-    &#39;resnet152&#39;: &#39;https://download.pytorch.org/models/resnet152-b121ed2d.pth&#39;,
-}</code></pre>
-<hr>
-<pre><code>def resnet50(pretrained=False, **kwargs):
-    &quot;&quot;&quot;Constructs a ResNet-50 model.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    &quot;&quot;&quot;
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls[&#39;resnet50&#39;]))
-    return model</code></pre>
-<p>另一个则是关键字参数，在<strong>model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)</strong>这里会被传入。</p>
-<p>注意到</p>
-<pre><code>class ResNet(nn.Module):
-
-    def __init__(self, block, layers, num_classes=1000):
-        self.inplanes = 64
-        super(ResNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
-                               bias=False)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
-
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
-            elif isinstance(m, nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()</code></pre>
-<p><strong><strong>init</strong>()</strong>函数中存在num_classes这个默认参数，因此我们可以通过**kwargs这个关键字参数传递待分类的标签数目。比如我们希望num_classes=10，那么如此调用即可。</p>
-<pre><code>net = models.resnet50(num_classes=10)</code></pre>
-<h1 id="分类任务中计算accuracy">分类任务中计算Accuracy</h1>
-<p>在分类中一般使用<strong>torch.max()</strong>将网络的输出结果（标签向量）中预测概率最大的索引提取出来，并压榨(squeeze)成一维向量，然后统计正确率。 另外需要注意的是，如果网络模型中包含dropout和batchnorm等只在训练中启用的层，那么需要使用net.eval()将网络模型转为测试模式以禁用他们，测试后再调用net.train()启用他们继续训练。</p>
-<p>一个简单的例子：</p>
-<pre><code>if step % 5 == 4:
- net.eval()
- correct = 0
- for _,(t_x,t_y) in enumerate(valid_loader):
-     test_x = Variable(t_x).cuda()
-     test_y = Variable(t_y).cuda()
-     test_output = net(test_x)
-     pred_y = torch.max(test_output,1)[1].cuda().data.squeeze()
-     correct += torch.sum(pred_y == test_y.data)
- print(&quot;Epoch: %d Step: %d Loss: %f Accuracy: %f&quot; % (epoch + 1,step + 1,running_loss/5,correct/split))
- running_loss = 0
- net.train()</code></pre>
 
       
     </div>
@@ -598,8 +396,8 @@ model_urls = {
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/01/25/how-to-migrate-hexo-folder/" rel="next" title="（转载）如何在不同终端之间迁移HEXO博客文件夹">
-                <i class="fa fa-chevron-left"></i> （转载）如何在不同终端之间迁移HEXO博客文件夹
+              <a href="/2018/01/30/something-about-pytorch/" rel="next" title="pytorch小总结">
+                <i class="fa fa-chevron-left"></i> pytorch小总结
               </a>
             
           </div>
@@ -713,7 +511,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -790,7 +588,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#pytorch"><span class="nav-number">1.</span> <span class="nav-text">Pytorch</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据读写"><span class="nav-number">2.</span> <span class="nav-text">数据读写</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#调用实现好的模型"><span class="nav-number">3.</span> <span class="nav-text">调用实现好的模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分类任务中计算accuracy"><span class="nav-number">4.</span> <span class="nav-text">分类任务中计算Accuracy</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用的设计机制"><span class="nav-number">1.</span> <span class="nav-text">使用的设计机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#那么为什么要这样设计呢"><span class="nav-number">2.</span> <span class="nav-text">那么为什么要这样设计呢？</span></a></li></ol></div>
             
 
           </div>
