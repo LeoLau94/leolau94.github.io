@@ -262,6 +262,365 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/01/30/something-about-pytorch-mxnet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Leo Lau">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar_leo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="A Secret Garden">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/30/something-about-pytorch-mxnet/" itemprop="url">pytorch小总结</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-30T10:15:44+08:00">
+                2018-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/深度学习框架/" itemprop="url" rel="index">
+                    <span itemprop="name">深度学习框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="pytorch">Pytorch</h1>
+<p>这个框架确实用起来非常好用，有很多东西都封装好了。 以下是近来用到的几种方法和API。</p>
+<h1 id="数据预处理">数据预处理</h1>
+<p>对于数据的预处理主要用到<strong>torchvision.transforms</strong>这里面的函数，其中一个很方便的，构造预处理拓扑的方式是调用</p>
+<blockquote>
+<p>class torchvision.transforms.Compose(transforms)</p>
+</blockquote>
+<p>Parameters: transforms (list of Transform objects) – list of transforms to compose.</p>
+<p>一个简单的预处理例子：</p>
+<pre><code>normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+train_transform = transforms.Compose(
+    [
+     transforms.RandomCrop((224,224)),
+     transforms.ToTensor(),
+     normalize
+    ]
+)
+valid_transform = transforms.Compose(
+    [
+     transforms.Resize((224,224)),
+     transforms.ToTensor(),
+     normalize
+    ]
+)</code></pre>
+<h1 id="数据读写">数据读写</h1>
+<p>最常用的就是继承<strong>torch.utils.data</strong>里面的</p>
+<blockquote>
+<p>class torch.utils.data.Dataset</p>
+</blockquote>
+<p>这个类，并且重写其中的**<strong>len</strong>()和__getitem__()**这个两个函数</p>
+<p>然后使用</p>
+<blockquote>
+<p>class torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, sampler=None, batch_sampler=None, num_workers=0, collate_fn=<function default_collate="">, pin_memory=False, drop_last=False)</function></p>
+</blockquote>
+<p>Parameters:</p>
+<ul>
+<li>dataset (Dataset) – dataset from which to load the data.</li>
+<li>batch_size (int, optional) – how many samples per batch to load (default: 1).</li>
+<li>shuffle (bool, optional) – set to True to have the data reshuffled at every epoch (default: False).</li>
+<li>sampler (Sampler, optional) – defines the strategy to draw samples from the dataset. If specified, shuffle must be False.</li>
+<li>batch_sampler (Sampler, optional) – like sampler, but returns a batch of indices at a time. Mutually exclusive with batch_size, shuffle, sampler, and drop_last.</li>
+<li>num_workers (int, optional) – how many subprocesses to use for data loading. 0 means that the data will be loaded in the main process (default: 0)</li>
+<li>collate_fn (callable, optional) – merges a list of samples to form a mini-batch.</li>
+<li>pin_memory (bool, optional) – If True, the data loader will copy tensors into CUDA pinned memory before returning them.</li>
+<li>drop_last (bool, optional) – set to True to drop the last incomplete batch, if the dataset size is not divisible by the batch size. If False and the size of dataset is not divisible by the batch size, then the last batch will be smaller. (default: False)</li>
+</ul>
+<p>来封装成数据读取器用以批训练。一般可以使用<strong>enumerate()和iter()</strong>进行迭代循环。</p>
+<p>阅读源码不难发现，其实<strong>torch.utils.data.Dataset</strong>这个类初始化工作主要就是将数据文件的路径收集起来，然后其中的<strong><strong>getitem</strong>()</strong>根据收集的文件路径负责打开数据文件，并进行一系列的数据预处理。而<strong>torch.utils.data.DataLoader</strong>主要就是根据<strong>batch_size</strong>调用<strong><strong>getitem</strong>()</strong>。</p>
+<p>一个简单的自定义数据集例子：</p>
+<p><strong>这个例子是当初想自己实现分离训练集和验证集的代码，但是后来发现不那么好在一个dataset中分离，所以就弃坑了。代码并不能直接用，只是提供一个重写的思路。</strong></p>
+<pre><code>import torch
+import torch.utils.data as Data
+import torchvision.transforms as T
+import os
+import numpy as np
+from PIL import Image
+class ImageDataSet_Train(Data.Dataset):
+
+def __init__(self,root,transforms=[],valid_rate=0.1):
+    transforms_error_msg = &quot;either train_transforms &amp; valid_transforms, or nothing&quot;
+    valid_rate_error_msg = &quot;valid_rate should be in the range [0,1]&quot;
+    assert ((len(transforms)==0) or (len(transforms)==2)), transforms_error_msg
+    assert ((valid_size &gt;= 0) and (valid_size &lt;= 1)), valid_rate_error_msg
+    normalize = T.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225])
+    # load train_data and then split it into train_set and valid_set according to valid_rate
+
+    label_folders = [os.path.join(root,img) for img in os.listdir(root)]
+    self.labels = [label.split(&#39;/&#39;)[-1] for label in label_folders]
+    imgs = [os.path.join(l,f) for l in label_folders for f in os.listdir(l)]
+    imgs = np.random.permutation(imgs)
+    set_size = len(imgs)
+    #calculate the size of valid_set and store the start and end index of valid_set[start,end)
+    split = np.floor(valid_rate*set_size)
+    self.valid_start = 0
+    self.valid_end = split
+    self.valid_set = imgs[self.valid_start:self.valid_end]
+    
+    #concatenate the rest data as train_set
+    self.train_set = imgs[0:self.valid_start].extend(imgs[self.valid_end:])
+    
+    #if no transforms is given
+    if len(transforms) == 0:
+        self.train_transforms = T.Compose([
+            T.Resize([256,256]),
+            T.RandomCrop(32,padding=4),
+            T.RandomHorizontalFlip(),
+            T.ToTensor(),
+            normalize
+            ])
+        self.valid_transforms = T.Compose([
+            T.Resize([256,256]),
+            T.ToTensor(),
+            normalize
+            ])
+    else:
+        self.train_transforms = transforms[0]
+        self.valid_transforms = transforms[1]
+    
+def __getitem__(self,index):
+    img_path = self.train_set[index]
+    &#39;&#39;&#39;关键的一步，根据路径和命名规则分离出标签，并转换相应的编号&#39;&#39;&#39;
+    label = self.labels.index(img_path.split(&#39;.&#39;))
+    data = Image.open(img_path)
+    data = self.train_transforms(data)
+    return data,label</code></pre>
+<p>对于图片数据集，pytorch有一个现成的API可以使用，它会自动读取形如：/train/label/ 的数据集，然后自动对各个label进行编号（从0开始）。</p>
+<blockquote>
+<p>class torchvision.datasets.ImageFolder(root, transform=None, target_transform=None, loader=<function default_loader="">)</function></p>
+</blockquote>
+<p>Parameters:</p>
+<ul>
+<li>root (string) – Root directory path.</li>
+<li>transform (callable, optional) – A function/transform that takes in an PIL image and returns a transformed version. E.g, transforms.RandomCrop</li>
+<li>target_transform (callable, optional) – A function/transform that takes in the target and transforms it.</li>
+<li>loader – A function to load an image given its path.</li>
+</ul>
+<p>一个简单的使用读取并分离出训练集和验证集的例子：</p>
+<pre><code>data_dir = #where your data dir locates
+&#39;&#39;&#39;训练集需要做增强处理，验证集不需要，但对两者原始样本的改动必须保持一直&#39;&#39;&#39;
+train_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=train_transform)
+valid_dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=valid_transform)
+
+&#39;&#39;&#39;分类数目，标签可以直接查看classes这个属性&#39;&#39;&#39;
+nclasses = len(train_dataset.classes)
+num_train = len(train_dataset)#样本数
+
+&#39;&#39;&#39;构造训练集乱序索引，并根据指定的验证集比例大小，划分一部分索引子集作为验证集索引&#39;&#39;&#39;
+indices = list(range(num_train))
+split = int(np.floor(VALID_SIZE * num_train))
+np.random.seed(0)
+np.random.shuffle(indices)
+train_idx, valid_idx = indices[split:], indices[:split]
+
+&#39;&#39;&#39;这里用到了SubsetRandomSampler来根据传入的索引返回子集&#39;&#39;&#39;
+train_sampler = Data.sampler.SubsetRandomSampler(train_idx)
+valid_sampler = Data.sampler.SubsetRandomSampler(valid_idx)
+
+&#39;&#39;&#39;构造迭代器&#39;&#39;&#39;
+train_loader = Data.DataLoader(train_dataset, 
+                    batch_size=BATCH_SIZE,sampler=train_sampler,
+                    num_workers=2, pin_memory=True,)
+valid_loader = Data.DataLoader(valid_dataset, 
+                    batch_size=BATCH_SIZE, sampler=valid_sampler, 
+                    num_workers=2, pin_memory=True)</code></pre>
+<h1 id="调用实现好的模型">调用实现好的模型</h1>
+<p>ResNet50</p>
+<blockquote>
+<p>torchvision.models.resnet50(pretrained=False, **kwargs)</p>
+</blockquote>
+<p>一个默认参数pretrained表示是否使用预训练模型，也就是从指定URL下载已经训练好的模型参数。</p>
+<p>对应源码如下：</p>
+<pre><code>__all__ = [&#39;ResNet&#39;, &#39;resnet18&#39;, &#39;resnet34&#39;, &#39;resnet50&#39;, &#39;resnet101&#39;,
+           &#39;resnet152&#39;]
+
+
+model_urls = {
+    &#39;resnet18&#39;: &#39;https://download.pytorch.org/models/resnet18-5c106cde.pth&#39;,
+    &#39;resnet34&#39;: &#39;https://download.pytorch.org/models/resnet34-333f7ec4.pth&#39;,
+    &#39;resnet50&#39;: &#39;https://download.pytorch.org/models/resnet50-19c8e357.pth&#39;,
+    &#39;resnet101&#39;: &#39;https://download.pytorch.org/models/resnet101-5d3b4d8f.pth&#39;,
+    &#39;resnet152&#39;: &#39;https://download.pytorch.org/models/resnet152-b121ed2d.pth&#39;,
+}</code></pre>
+<hr>
+<pre><code>def resnet50(pretrained=False, **kwargs):
+    &quot;&quot;&quot;Constructs a ResNet-50 model.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+    &quot;&quot;&quot;
+    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    if pretrained:
+        model.load_state_dict(model_zoo.load_url(model_urls[&#39;resnet50&#39;]))
+    return model</code></pre>
+<p>另一个则是关键字参数，在<strong>model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)</strong>这里会被传入。</p>
+<p>注意到</p>
+<pre><code>class ResNet(nn.Module):
+
+    def __init__(self, block, layers, num_classes=1000):
+        self.inplanes = 64
+        super(ResNet, self).__init__()
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
+                               bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu = nn.ReLU(inplace=True)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.layer1 = self._make_layer(block, 64, layers[0])
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+        self.avgpool = nn.AvgPool2d(7, stride=1)
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()</code></pre>
+<p><strong><strong>init</strong>()</strong>函数中存在num_classes这个默认参数，因此我们可以通过**kwargs这个关键字参数传递待分类的标签数目。比如我们希望num_classes=10，那么如此调用即可。</p>
+<pre><code>net = models.resnet50(num_classes=10)</code></pre>
+<h1 id="分类任务中计算accuracy">分类任务中计算Accuracy</h1>
+<p>在分类中一般使用<strong>torch.max()</strong>将网络的输出结果（标签向量）中预测概率最大的索引提取出来，并压榨(squeeze)成一维向量，然后统计正确率。 另外需要注意的是，如果网络模型中包含dropout和batchnorm等只在训练中启用的层，那么需要使用net.eval()将网络模型转为测试模式以禁用他们，测试后再调用net.train()启用他们继续训练。</p>
+<p>一个简单的例子：</p>
+<pre><code>if step % 5 == 4:
+ net.eval()
+ correct = 0
+ for _,(t_x,t_y) in enumerate(valid_loader):
+     test_x = Variable(t_x).cuda()
+     test_y = Variable(t_y).cuda()
+     test_output = net(test_x)
+     pred_y = torch.max(test_output,1)[1].cuda().data.squeeze()
+     correct += torch.sum(pred_y == test_y.data)
+ print(&quot;Epoch: %d Step: %d Loss: %f Accuracy: %f&quot; % (epoch + 1,step + 1,running_loss/5,correct/split))
+ running_loss = 0
+ net.train()</code></pre>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/01/25/how-to-migrate-hexo-folder/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1330,7 +1689,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1341,7 +1700,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1352,7 +1711,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
