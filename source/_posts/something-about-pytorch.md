@@ -247,3 +247,9 @@ ResNet50
 	 print("Epoch: %d Step: %d Loss: %f Accuracy: %f" % (epoch + 1,step + 1,running_loss/5,correct/split))
 	 running_loss = 0
 	 net.train()
+
+#使用指定GPU
+使用编号为6，7的显卡：
+
+	import os
+	os.environ["CUDA_VISIBLE_DEVICES"] = "6,7"
