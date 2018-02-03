@@ -9,3 +9,4 @@ mxnet最近几个月（2017/09起）都由[**沐神**](https://www.zhihu.com/peo
 
 # 简单介绍下MXNET
 （挖个坑，以后填）
+社区里看到的关于优化问题的一个视频链接，google brain的大佬讲解的，就是速度有点慢：[传送门](http://videolectures.net/deeplearning2015_goodfellow_network_optimization/)
