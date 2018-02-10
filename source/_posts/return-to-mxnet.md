@@ -59,5 +59,11 @@ mxnet最近几个月（2017/09起）都由[**沐神**](https://www.zhihu.com/peo
 
 # 为什么选择MXNET？
 
+贴上**MXNET**开发人员的一段推销：
+
+>深度学习框架大体分为两类：以TensorFlow，caffe2为代表的静态图（Symbolic）框架和以Chainer，Pytorch为代表的动态图（Imperative）框架。静态图的优势在于速度快，省内存，便于线上部署。而动态图框架的优势是灵活，易用，debug方便，特别是在自然语言处理和增强学习等领域，比起静态图框架有显著优势。Gluon同时支持灵活的动态图和高效的静态图，让你在享受动态编程的灵活易用的同时最小化性能的损失。而Gluon的HybridBlock和hybridize接口让你可以在静态动态间一键切换。0.11版Gluon比0.20版Pytorch快10%以上，在未来的一两个月我们会加入更多优化，再提高10%以上的性能。
+
+>作者：[解浚源](https://www.zhihu.com/question/64199027/answer/218400561)
+
 简而言之，感觉**MXNET**是**TensorFlow**与**PyTorch**的一个折衷。
 (以后有时间再填坑)
