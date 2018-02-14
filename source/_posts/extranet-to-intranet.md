@@ -45,6 +45,21 @@ category: 使用教程
 # Proxifier
 
 使用proxifier，我们就可以使用**B**上的代理服务器啦，首先在`proxifier主界面->Profile->Proxy Server`
+
+---
+
+如果你是在官网下载，那么根据你下载是standard版本（就是需要安装的版本）或者是portable版本，
+选择对应的注册码
+
+> 
+```
+L6Z8A-XY2J4-BTZ3P-ZZ7DF-A2Q9C（Portable Edition）
+5EZ8G-C3WL5-B56YG-SCXM9-6QZAP（Standard Edition）
+P427L-9Y552-5433E-8DSR3-58Z68（MAC）
+```
+
+---
+
 如下图添加代理服务器
 ![](/img/proxifier_proxy_server.png)
 注意，这里会提醒你是否设为默认代理规则的action，选择否。
