@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="A Secret Garden">
 <meta property="og:description" content="mxnet最近几个月（2017/09起）都由沐神在大力主推，除了在知乎 大力宣传和建立技术讨论社区外，更是亲自上阵，录制中文教程视频。当然咯，mxnet的中文深度学习教程也比以前友好很多,其中最为欣赏是每个小章节大多都会留有一两道思考题，这比起其他的tutorials来说，更加灵活和具有启发性，相比之下，其他tutorials很容易给新手带来一种“按部就班地学习”的感受，这对于我这种ADHD患者而">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-02-02T06:35:28.116Z">
+<meta property="og:updated_time" content="2018-03-06T12:16:49.500Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="回归MXNET">
 <meta name="twitter:description" content="mxnet最近几个月（2017/09起）都由沐神在大力主推，除了在知乎 大力宣传和建立技术讨论社区外，更是亲自上阵，录制中文教程视频。当然咯，mxnet的中文深度学习教程也比以前友好很多,其中最为欣赏是每个小章节大多都会留有一两道思考题，这比起其他的tutorials来说，更加灵活和具有启发性，相比之下，其他tutorials很容易给新手带来一种“按部就班地学习”的感受，这对于我这种ADHD患者而">
@@ -355,6 +355,57 @@
         <p>mxnet最近几个月（2017/09起）都由<a href="https://www.zhihu.com/people/li-mu-23/activities" target="_blank" rel="noopener"><strong>沐神</strong></a>在大力主推，除了在<a href="https://www.zhihu.com/topic/20044209/hot" target="_blank" rel="noopener"><strong>知乎</strong></a> 大力宣传和建立<a href="https://discuss.gluon.ai/" target="_blank" rel="noopener"><strong>技术讨论社区</strong></a>外，更是亲自上阵，录制<a href="https://space.bilibili.com/209599371/#/video" target="_blank" rel="noopener"><strong>中文教程视频</strong></a>。当然咯，mxnet的<a href="https://zh.gluon.ai/" target="_blank" rel="noopener"><strong>中文深度学习教程</strong></a>也比以前友好很多,其中最为欣赏是每个小章节大多都会留有一两道思考题，这比起其他的tutorials来说，更加灵活和具有启发性，相比之下，其他tutorials很容易给新手带来一种<strong>“按部就班地学习”</strong>的感受，这对于我这种ADHD患者而言，很快就会感到枯燥。 <a id="more"></a></p>
 <h1 id="简单介绍下mxnet">简单介绍下MXNET</h1>
 <p>（挖个坑，以后填） 社区里看到的关于优化问题的一个视频链接，google brain的大佬讲解的，就是速度有点慢：<a href="http://videolectures.net/deeplearning2015_goodfellow_network_optimization/" target="_blank" rel="noopener">传送门</a></p>
+<hr>
+<p>2/9/2018更新！</p>
+<hr>
+<p>虽然说是简单介绍<strong>MXNET</strong>，但是我还是想从历史开始说起。那么就不得不提起<a href="https://github.com/dmlc" target="_blank" rel="noopener"><strong>DMLC</strong></a>以下是<strong>DMLC</strong>的<em>“自我介绍”</em>：</p>
+<blockquote>
+<p>机器学习能从数据中学习。通常数据越多，能学习到的模型就越好。在数据获得越来越便利的今天，机器学习应用无论在广度上还是在深度上都有了显著进步。虽然近年来计算能力得到了大幅提高，但它仍然远远不及数据的增长和机器学习模型的复杂化。因此，机器学习算法速度和系统性能是目前工业界和学术界共同关心的热点。</p>
+</blockquote>
+<blockquote>
+<p>高性能和易用性的开源系统能对机器学习应用的其极大的推动作用。但我们发现目前兼具这两个特点的开源系统并不多，而且分散在各处。因此我们联合数个已有且被广泛使用的C++分布式机器学习系统的开发者，希望通过一个统一的组织来推动开源项目。我们为这个项目取名DMLC: Deep Machine Learning in Common，也可以认为是Distributed Machine Learning in C++。中文名为深盟。</p>
+</blockquote>
+<p>目前<strong>DMLC</strong>的主要项目有：<strong>xgboost,nnvm,ps-lite,mxnet,tvm,dmlc-core</strong>等等</p>
+<p>其中<strong>MXNET</strong>的前身就是<strong>DMLC</strong>的<strong>CXXNET</strong>，在技术上，<strong>CXXNET</strong>有如下两个亮点：</p>
+<blockquote>
+<p><strong>灵活的公式支持和极致的C++模板编程</strong> 追求速度极致的开发者通常使用C++来实现深度神经网络。但往往需要给每个神经网络的层和更新公式编写独立的CUDA kernel。很多以C++为核心的代码之所以没有向matlab/numpy那样支持非常灵活的张量计算，是因为因为运算符重载和临时空间的分配会带来效率的降低。 然而，cxxnet利用深盟的mshadow提供了类似matlab/numpy的编程体验，但同时保留了C++性能的高效性。其背后的核心思想是expression template，它通过模板编程技术将开发者写的公式自动展开成优化过的代码，避免重载操作符等带来的额外数据拷贝和系统消耗。另外，mshadow通过模板使得非常方便的讲代码切换到CPU还是GPU运行。</p>
+</blockquote>
+<blockquote>
+<p><strong>通用的分布式解决方案</strong> 在分布式深度神经网络中，我们既要处理一台机器多GPU卡，和多台机器多GPU卡的情况。然而后者的延迟和带宽远差于前者，因此需要对这种两个情形做不同的技术考虑。cxxnet采用mshadow-ps这样一个统一的参数共享接口，并利用接下来将要介绍Parameter Server实现了一个异步的通讯接口。其通过单机多卡和多机多卡采用不同的数据一致性模型来达到算法速度和系统性能的最佳平衡</p>
+</blockquote>
+<p>而<strong>MXNET</strong>很好地继承了这些优点，于2015年九月面世。</p>
+<blockquote>
+<p>MXNet 是一个全功能，灵活可编程和高扩展性的深度学习框架，支持深度学习模型中的最先进技术，包括卷积神经网络（CNN）和长期短期记忆网络（LSTM）。MXNet 由学术界发起，包括数个顶尖大学的研究人员的贡献，这些机构包括华盛顿大学和卡内基梅隆大学。</p>
+</blockquote>
+<p>李沐大神的亲口介绍：</p>
+<blockquote>
+<p>mxnet是cxxnet的下一代，目前实现了cxxnet所有功能，但借鉴了minerva/torch7/theano，加入更多新的功能。</p>
+</blockquote>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>ndarray编程接口，类似matlab/numpy.ndarray/</li>
+<li>torch.tensor。独有优势在于通过背后的engine可以在性能上和内存使用上更优。</li>
+<li>symbolic接口。这个可以使得快速构建一个神经网络，和自动求导。</li>
+<li>更多binding 目前支持比较好的是python，马上会有julia和R。</li>
+<li>更加方便的多卡和多机运行。</li>
+<li>性能上更优。目前mxnet比cxxnet快40%，而且gpu内存使用少了一半。</li>
+</ol>
+</blockquote>
+<p>尽管发布时间在目前的主流深度学习框架中算是比较早的，但是<strong>MXNET</strong>过去很长一段时间都不温不火，很重要的原因是其比较糟糕的文档和社区环境（貌似没什么社区额？）。而自从16年年底，<strong>AMAZON</strong>宣布选择<strong>MXNET</strong>作为主要的深度学习框架后，<strong>MXNET</strong>似乎迎来了春天。</p>
+<blockquote>
+<p>MXNet 是在卡内基梅隆大学中诞生的，它是我所看到的最完美的深度学习可扩展框架，它可以让计算机科学更加美好。让不同学科，不同工作的人们团结在一起。我们对亚马逊选择 MXNet 感到兴奋，MXNet 将由此变得更加强大。」卡内基梅隆大学计算机科学系主任 Andrew Moore 说道。</p>
+</blockquote>
+<p>去年，也就是17年九月份开始，<strong>MXNET</strong>主要负责人<strong>李沐</strong>根据<strong>MXNET</strong>主要使用群体是国内用户这一特点，恰如其分地推出了一系列中文教程。除了在<a href="https://www.zhihu.com/topic/20044209/hot" target="_blank" rel="noopener"><strong>知乎</strong></a> 大力宣传和建立<a href="https://discuss.gluon.ai/" target="_blank" rel="noopener"><strong>技术讨论社区</strong></a>外，更是亲自上阵，录制<a href="https://space.bilibili.com/209599371/#/video" target="_blank" rel="noopener"><strong>中文教程视频</strong></a>。还有<a href="https://zh.gluon.ai/" target="_blank" rel="noopener"><strong>中文深度学习教程</strong></a></p>
+<p>仿佛<strong>MXNET</strong>的春天迫在眉睫。</p>
+<h1 id="为什么选择mxnet">为什么选择MXNET？</h1>
+<p>贴上<strong>MXNET</strong>开发人员的一段推销：</p>
+<blockquote>
+<p>深度学习框架大体分为两类：以TensorFlow，caffe2为代表的静态图（Symbolic）框架和以Chainer，Pytorch为代表的动态图（Imperative）框架。静态图的优势在于速度快，省内存，便于线上部署。而动态图框架的优势是灵活，易用，debug方便，特别是在自然语言处理和增强学习等领域，比起静态图框架有显著优势。Gluon同时支持灵活的动态图和高效的静态图，让你在享受动态编程的灵活易用的同时最小化性能的损失。而Gluon的HybridBlock和hybridize接口让你可以在静态动态间一键切换。0.11版Gluon比0.20版Pytorch快10%以上，在未来的一两个月我们会加入更多优化，再提高10%以上的性能。</p>
+</blockquote>
+<blockquote>
+<p>作者：<a href="https://www.zhihu.com/question/64199027/answer/218400561" target="_blank" rel="noopener">解浚源</a></p>
+</blockquote>
+<p>简而言之，感觉<strong>MXNET</strong>是<strong>TensorFlow</strong>与<strong>PyTorch</strong>的一个折衷。 (以后有时间再填坑)</p>
 
       
     </div>
@@ -394,6 +445,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/06/extranet-to-intranet/" rel="prev" title="如何从外部网访问内部网的服务器">
+                如何从外部网访问内部网的服务器 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -500,7 +555,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -522,7 +577,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -577,7 +632,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简单介绍下mxnet"><span class="nav-number">1.</span> <span class="nav-text">简单介绍下MXNET</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简单介绍下mxnet"><span class="nav-number">1.</span> <span class="nav-text">简单介绍下MXNET</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么选择mxnet"><span class="nav-number">2.</span> <span class="nav-text">为什么选择MXNET？</span></a></li></ol></div>
             
 
           </div>

@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="HEXO教程,HEXO迁移," />
+  <meta name="keywords" content="teamviewer,ccproxy,proxifier," />
 
 
 
@@ -79,18 +79,27 @@
 
 
 
-<meta name="description" content="旧终端的操作  在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
-<meta name="keywords" content="HEXO教程,HEXO迁移">
+<meta name="description" content="相信大家都是选择使用远程控制内部网的一台机子，来实现这个功能的。但是我想对这种方式并不是特别满意，尤其是当我只是需要使用服务器的资源，至于其他的东西，我本地的机子都可以满足。因此，我一直都很渴望能够使用relay的方式来实现访问。 以下将要介绍如何使用teamviewer + ccproxy + proxifier来实现这个想法，所以，也多谢这几个软件，使得我无需直面真正的技术难题，功劳应当是它们">
+<meta name="keywords" content="teamviewer,ccproxy,proxifier">
 <meta property="og:type" content="article">
-<meta property="og:title" content="（转载）如何在不同终端之间迁移HEXO博客文件夹">
-<meta property="og:url" content="https://leolau94.github.io/2018/01/25/how-to-migrate-hexo-folder/index.html">
+<meta property="og:title" content="如何从外部网访问内部网的服务器">
+<meta property="og:url" content="https://leolau94.github.io/2018/02/06/extranet-to-intranet/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="旧终端的操作  在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
+<meta property="og:description" content="相信大家都是选择使用远程控制内部网的一台机子，来实现这个功能的。但是我想对这种方式并不是特别满意，尤其是当我只是需要使用服务器的资源，至于其他的东西，我本地的机子都可以满足。因此，我一直都很渴望能够使用relay的方式来实现访问。 以下将要介绍如何使用teamviewer + ccproxy + proxifier来实现这个想法，所以，也多谢这几个软件，使得我无需直面真正的技术难题，功劳应当是它们">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-26T05:08:35.912Z">
+<meta property="og:image" content="https://leolau94.github.io/img/teamviewer_vpn.png">
+<meta property="og:image" content="https://leolau94.github.io/img/teamviewer_vpn_connected.png">
+<meta property="og:image" content="https://leolau94.github.io/img/ccproxy_setting.png">
+<meta property="og:image" content="https://leolau94.github.io/img/ccproxy_account.png">
+<meta property="og:image" content="https://leolau94.github.io/img/proxifier_proxy_server.png">
+<meta property="og:image" content="https://leolau94.github.io/img/proxifier_proxy_rule.png">
+<meta property="og:image" content="https://leolau94.github.io/img/ssh_to_server.png">
+<meta property="og:image" content="https://leolau94.github.io/img/ccproxy_setting_advanced.png">
+<meta property="og:updated_time" content="2018-03-06T12:16:49.485Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="（转载）如何在不同终端之间迁移HEXO博客文件夹">
-<meta name="twitter:description" content="旧终端的操作  在username.github.io仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。">
+<meta name="twitter:title" content="如何从外部网访问内部网的服务器">
+<meta name="twitter:description" content="相信大家都是选择使用远程控制内部网的一台机子，来实现这个功能的。但是我想对这种方式并不是特别满意，尤其是当我只是需要使用服务器的资源，至于其他的东西，我本地的机子都可以满足。因此，我一直都很渴望能够使用relay的方式来实现访问。 以下将要介绍如何使用teamviewer + ccproxy + proxifier来实现这个想法，所以，也多谢这几个软件，使得我无需直面真正的技术难题，功劳应当是它们">
+<meta name="twitter:image" content="https://leolau94.github.io/img/teamviewer_vpn.png">
 
 
 
@@ -120,13 +129,13 @@
 
 
 
-  <link rel="canonical" href="https://leolau94.github.io/2018/01/25/how-to-migrate-hexo-folder/"/>
+  <link rel="canonical" href="https://leolau94.github.io/2018/02/06/extranet-to-intranet/"/>
 
 
 
 
 
-  <title>（转载）如何在不同终端之间迁移HEXO博客文件夹 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title>如何从外部网访问内部网的服务器 | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
   
 
 
@@ -263,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/01/25/how-to-migrate-hexo-folder/">
+    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/02/06/extranet-to-intranet/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Leo Lau">
@@ -280,7 +289,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">（转载）如何在不同终端之间迁移HEXO博客文件夹</h1>
+          <h1 class="post-title" itemprop="name headline">如何从外部网访问内部网的服务器</h1>
         
 
         <div class="post-meta">
@@ -292,8 +301,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-25T20:41:33+08:00">
-                2018-01-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-06T22:29:37+08:00">
+                2018-02-06
               </time>
             
 
@@ -352,61 +361,43 @@
       
 
       
-        <h1 id="旧终端的操作">旧终端的操作</h1>
-<blockquote>
-<p>在<strong>username.github.io</strong>仓库中，目前默认的分支是master,用来存放静态文件。我们新建一个分支hexo,并设为默认分支，用来存放环境文件。 <a id="more"></a></p>
-</blockquote>
-<blockquote>
-<p>这里是比较关键的一步了，hexo分支是基于master分支的，它在创建时被赋予了与master分支同样的内容--静态文件。做乜啊，hexo分支不是要存放环境文件的吗？我当时就是在这里比较晕，因为知乎的高票答案在这里说的并不是很清楚。其实现在目的很清晰：<strong>我们希望hexo分支是空的，并把我们本地的hexo项目与hexo分支关联起来，好把环境文件推送过去。</strong>要达到这个目的，要分以下几步走：</p>
-</blockquote>
+        <p>相信大家都是选择使用远程控制内部网的一台机子，来实现这个功能的。但是我想对这种方式并不是特别满意，尤其是当我只是需要使用服务器的资源，至于其他的东西，我本地的机子都可以满足。因此，我一直都很渴望能够使用relay的方式来实现访问。 以下将要介绍如何使用<strong>teamviewer</strong> + <strong>ccproxy</strong> + <strong>proxifier</strong>来实现这个想法，所以，也多谢这几个软件，使得我无需直面真正的技术难题，功劳应当是它们的。 <a id="more"></a></p>
 <ul>
-<li>github上切换到hexo分支，<code>git clone</code>仓库到本地。</li>
-<li>此时本地会多出一个username.github.io文件夹，命令行cd进去，删除除.git文件夹（如果你看不到这个文件夹，说明是隐藏了。windows下需要右击文件夹内空白处，点选'显示/隐藏 异常文件'，Mac下我就不知道了）外的其他文件夹。</li>
-<li>命令行<code>git add -A</code>把工作区的变化（包括已删除的文件）提交到暂存区（ps:<code>git add .</code>提交的变化不包括已删除的文件）。</li>
-<li>命令行<code>git commint -m &quot;some description&quot;</code>提交。</li>
-<li>命令行<code>git push origin</code>hexo推送到远程hexo分支。此时刷下github，如果正常操作，hexo分支应该已经被清空了。</li>
-<li>复制本地username.github.io文件夹中的.git文件夹到hexo项目根目录下。此时，hexo项目已经变成了和远程hexo分支关联的本地仓库了。而username.github.io文件夹的使命到此为止，你可以把它删掉，因为我们只是把它作为一个“中转站”的角色。以后每次发布新文章或修改网站样式文件时，<code>git add .</code> &amp; <code>git commit -m &quot;some description&quot;</code> &amp; <code>git push origin hexo</code>即可把环境文件推送到hexo分支。然后再<code>hexo g -d</code>发布网站并推送静态文件到master分支。</li>
+<li>需要的设备：一台在内部网的计算机<strong>B</strong>，一台用于主控的外部网的计算机<strong>A</strong>。</li>
+<li>教程使用的系统：Windows 10</li>
+<li>需要的软件：teamviewer,ccproxy,proxifier(这货好像被功夫网屏蔽了不少链接，不过你也可以使用系统自带的代理设置来访问搭建的代理服务器。)</li>
 </ul>
+<h1 id="teamviewer">Teamviewer</h1>
+<p>既然想要使用relay的方式访问，我们首先就要解决内网穿透问题，很幸福，目前实现内网穿透最好的软件就是teamviewer啦，而且而且个人还是免费使用的，就是有至多3个设备接入的限制。不过对于个人来说已经是绰绰有余。</p>
+<p>当然咯，我们并不是使用teamviewer的远程控制功能，而是使用它的VPN功能，将我们两部计算机<strong>A（主控）</strong>,<strong>B（位于内部网）</strong>建立起虚拟局域网。teamviewer默认是没有开启这个功能的，需要在安装的时候选择高级设置，然后在下一步中就可以选择安装VPN功能。那么已经安装好teamviewer的小伙伴们又该怎么开启呢，在下图中（<code>主界面-&gt;其他-&gt;选项</code>）选择安装即可。 <img src="/img/teamviewer_vpn.png"> 接下来，在两台计算机上开启teamviewer，相信用过的人都已经轻车熟路了。然后在<strong>A</strong>选择以VPN的形式连接<strong>B</strong>，然后连接建立成功会弹出以下界面，复制虚拟局域网内<strong>B（伙伴）</strong>的IP <img src="/img/teamviewer_vpn_connected.png"> 当然到这里还是不能保证<strong>A &amp; B</strong>是连同的，所以我们这里使用测试ping选项，来看看远程连接的连通性。一般ping不通的话最省事的招数就是把两个防火墙都关闭了（其实只用关闭一个，因为我不知道你们会把所使用的网络连接归为个人还是公用）—— 这招就跟 <code>chmod 777</code> 一个路子……哇哈哈，一点都不精致……扯远了。</p>
+<hr>
+<p>2/12/2018</p>
+<p>精致的做法：一般来说不建议关闭防火墙，所以为了能够ping通，建议在入站规则中启用<code>文件和打印机共享(回显请求 - ICMPv4-In)</code>即可。</p>
+<hr>
+<p>当保证ping通后，我们开始以<strong>B</strong>搭建代理服务器,供<strong>A</strong>访问。</p>
+<h1 id="ccproxy">Ccproxy</h1>
+<p>又一个傻瓜式的代理服务器搭建软件，非常EZ，要做的事情也不多。 首先在B安装好这个软件，然后<code>主界面-&gt;设置</code>，将本机的局域网IP地址设置为teamviewer vpn提供的虚拟局域网的IP，如下图 <img src="/img/ccproxy_setting.png"> 最后<code>主界面-&gt;账户</code>，添加一个如下图的账户 <img src="/img/ccproxy_account.png"> 添加账户是为了接下来使用proxifier建立sock5连接而所需的验证方式,当然，你这步不执行也没关系，哇哈哈。 到这里<strong>B</strong>的工作已经全部完成了。</p>
+<h1 id="proxifier">Proxifier</h1>
+<p>使用proxifier，我们就可以使用<strong>B</strong>上的代理服务器啦，首先在<code>proxifier主界面-&gt;Profile-&gt;Proxy Server</code></p>
+<hr>
+<p>如果你是在官网下载，那么根据你下载是standard版本（就是需要安装的版本）或者是portable版本， 选择对应的注册码</p>
 <blockquote>
-<p>至此，hexo的环境文件已经全部托管在github的hexo分支了。</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">L6Z8A-XY2J4-BTZ3P-ZZ7DF-A2Q9C（Portable Edition）</span><br><span class="line"><span class="number">5</span>EZ8G-C3WL5-B56YG-SCXM9<span class="number">-6</span>QZAP（Standard Edition）</span><br><span class="line">P427L<span class="number">-9</span>Y552<span class="number">-5433E-8</span>DSR3<span class="number">-58</span>Z68（MAC）</span><br></pre></td></tr></table></figure>
 </blockquote>
-<p>作者：nikolausliu 链接：https://www.jianshu.com/p/fceaf373d797 來源：简书 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-<h2 id="作者没有注意的一点">作者没有注意的一点：</h2>
-<p>以上步骤过后，<strong>如果hexo使用的主题是<code>git clone</code>命令得到的</strong>，那么还需要做一下几个步骤：</p>
-<ol style="list-style-type: decimal">
-<li>看下next主题文件夹下是否有.git文件夹和.gitignore文件，这两个文件存在的话git提交是会忽略掉next主题的。</li>
-<li>删除后因为该文件夹已经被纳入了版本管理中，先清空该文件夹的本地缓存然后再添加就行了 <code>git rm -r --cached path</code></li>
-<li><code>git add -A</code>，<code>git commit -m &quot;some description&quot;</code>，<code>git push origin hexo</code></li>
-</ol>
-<h1 id="新终端的操作">新终端的操作</h1>
-<h2 id="在新终端中git-clone成功后本地出现myhexo文件夹开始安装hexo环境">在新终端中git clone成功后，本地出现myhexo文件夹，开始安装hexo环境</h2>
-<ol style="list-style-type: decimal">
-<li><code>cd myhexo</code></li>
-<li><code>npm install hexo</code></li>
-<li><code>npm install</code></li>
-<li><code>npm install hexo-deployer-git</code></li>
-</ol>
-<h2 id="在新终端中继续使用和管理hexo">在新终端中继续使用和管理hexo</h2>
-<h3 id="新建文章并修改">新建文章并修改</h3>
-<p><code>hexo new xxx</code></p>
-<h3 id="提交原始md文件至远程repo">提交原始md文件至远程repo</h3>
-<ol style="list-style-type: decimal">
-<li><code>git status</code></li>
-<li><code>git add</code></li>
-<li><code>git commit -m xx</code></li>
-<li><code>git push</code></li>
-</ol>
-<h3 id="发布静态网页">发布静态网页</h3>
-<p>hexo g -d</p>
-<h2 id="切换至旧终端使用hexo">切换至旧终端使用hexo</h2>
-<h3 id="更新网站原始文件">更新网站原始文件</h3>
-<ol style="list-style-type: decimal">
-<li><code>git pull</code></li>
-<li><code>hexo g</code></li>
-<li><code>hexo server</code></li>
-</ol>
-<h1 id="section">2018/1/26</h1>
-<p>更详细的可以参考这个教程：<strong><a href="http://wangmuduo.com/2016/04/02/hexo-change-os/" target="_blank" rel="noopener">Hexo 换终端/换电脑小记</a></strong></p>
+<hr>
+<p>如下图添加代理服务器 <img src="/img/proxifier_proxy_server.png"> 注意，这里会提醒你是否设为默认代理规则的action，选择否。 然后<code>主界面-&gt;Profile-&gt;Proxification Rule</code>，添加代理规则，就像一开始所说，我们就只是要访问内部网的服务器而已，其他的完全不想走任何代理，所以我们如下图添加和设置规则 <img src="/img/proxifier_proxy_rule.png"> 这个规则意思就是，只有访问172.31网段格式的地址，才会使用我们在<strong>B</strong>上搭建代理，这里要根据你们使用的服务器地址设立，因人而异。</p>
+<p>到这里基本就完成了配置，然后测试一下，能否远程登陆服务器。 <img src="/img/ssh_to_server.png"></p>
+<p>Perfect！Done！ 如果你还有什么问题，可以给我发e-mail，不过如果你是男的，我一般都不会搭理你的。蛤蛤蛤！</p>
+<p>这是篇很没有技术含量的教程，也就只能骗骗那些遇事就重启的小女生啦（不错我就是这个目的），还望真大神们不要拆穿我的小把戏。</p>
+<p>完。</p>
+<hr>
+<p>2/7/2018更新</p>
+<hr>
+<p>在ccproxy的<code>设置-&gt;高级-&gt;网络</code>中，如下图设置，即可解决5分钟闲置连接关闭的问题 <img src="/img/ccproxy_setting_advanced.png"></p>
+<hr>
+<p>2/10/2018更新</p>
+<hr>
+<p>使用teamviewer的过程中发现，如果在连接WiFi的情况下，直接接入网线并关闭WiFi，一定要重新登录一次teamviewer，因为直接使用会导致出现异常而无法正常工作，比如我的直接建立VPN连接后，客户端会掉线并一直无法登录（提示服务器未响应）。</p>
 
       
     </div>
@@ -424,9 +415,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/HEXO教程/" rel="tag"># HEXO教程</a>
+            <a href="/tags/teamviewer/" rel="tag"># teamviewer</a>
           
-            <a href="/tags/HEXO迁移/" rel="tag"># HEXO迁移</a>
+            <a href="/tags/ccproxy/" rel="tag"># ccproxy</a>
+          
+            <a href="/tags/proxifier/" rel="tag"># proxifier</a>
           
         </div>
       
@@ -439,8 +432,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/01/23/structured-simplification/" rel="next" title="轻量化/紧凑的模型结构设计">
-                <i class="fa fa-chevron-left"></i> 轻量化/紧凑的模型结构设计
+              <a href="/2018/02/01/return-to-mxnet/" rel="next" title="回归MXNET">
+                <i class="fa fa-chevron-left"></i> 回归MXNET
               </a>
             
           </div>
@@ -449,8 +442,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/01/30/something-about-pytorch/" rel="prev" title="pytorch小总结">
-                pytorch小总结 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/03/06/Back-to-Pytorch/" rel="prev" title="回归PyTorch">
+                回归PyTorch <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -635,7 +628,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#旧终端的操作"><span class="nav-number">1.</span> <span class="nav-text">旧终端的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#作者没有注意的一点"><span class="nav-number">1.1.</span> <span class="nav-text">作者没有注意的一点：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#新终端的操作"><span class="nav-number">2.</span> <span class="nav-text">新终端的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在新终端中git-clone成功后本地出现myhexo文件夹开始安装hexo环境"><span class="nav-number">2.1.</span> <span class="nav-text">在新终端中git clone成功后，本地出现myhexo文件夹，开始安装hexo环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在新终端中继续使用和管理hexo"><span class="nav-number">2.2.</span> <span class="nav-text">在新终端中继续使用和管理hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#新建文章并修改"><span class="nav-number">2.2.1.</span> <span class="nav-text">新建文章并修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提交原始md文件至远程repo"><span class="nav-number">2.2.2.</span> <span class="nav-text">提交原始md文件至远程repo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布静态网页"><span class="nav-number">2.2.3.</span> <span class="nav-text">发布静态网页</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切换至旧终端使用hexo"><span class="nav-number">2.3.</span> <span class="nav-text">切换至旧终端使用hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更新网站原始文件"><span class="nav-number">2.3.1.</span> <span class="nav-text">更新网站原始文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section"><span class="nav-number">3.</span> <span class="nav-text">2018/1/26</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#teamviewer"><span class="nav-number">1.</span> <span class="nav-text">Teamviewer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ccproxy"><span class="nav-number">2.</span> <span class="nav-text">Ccproxy</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#proxifier"><span class="nav-number">3.</span> <span class="nav-text">Proxifier</span></a></li></ol></div>
             
 
           </div>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon16.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="pytorch," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="思前想后，最后还是回归到Pytorch这个框架。不得不说，比起MXNet，PyTorch的确是要灵活不少。 以前是自己半桶水，没有很好地领会到它的精髓之处。当然，现在也没有，d=====(￣▽￣*)b 一些模板代码(dirty)">
+<meta name="keywords" content="pytorch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="回归PyTorch">
+<meta property="og:url" content="https://leolau94.github.io/2018/03/06/Back-to-Pytorch/index.html">
+<meta property="og:site_name" content="A Secret Garden">
+<meta property="og:description" content="思前想后，最后还是回归到Pytorch这个框架。不得不说，比起MXNet，PyTorch的确是要灵活不少。 以前是自己半桶水，没有很好地领会到它的精髓之处。当然，现在也没有，d=====(￣▽￣*)b 一些模板代码(dirty)">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-06T12:43:04.764Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="回归PyTorch">
+<meta name="twitter:description" content="思前想后，最后还是回归到Pytorch这个框架。不得不说，比起MXNet，PyTorch的确是要灵活不少。 以前是自己半桶水，没有很好地领会到它的精髓之处。当然，现在也没有，d=====(￣▽￣*)b 一些模板代码(dirty)">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://leolau94.github.io/2018/03/06/Back-to-Pytorch/"/>
+
+
+
+
+
+  <title>回归PyTorch | A Secret Garden</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">A Secret Garden</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Talk is cheap, show me the money.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://leolau94.github.io/2018/03/06/Back-to-Pytorch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Leo Lau">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar_leo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="A Secret Garden">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">回归PyTorch</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-06T20:19:00+08:00">
+                2018-03-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/深度学习框架/" itemprop="url" rel="index">
+                    <span itemprop="name">深度学习框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思前想后，最后还是回归到Pytorch这个框架。不得不说，比起<strong>MXNet</strong>，<strong>PyTorch</strong>的确是要灵活不少。 以前是自己半桶水，没有很好地领会到它的精髓之处。当然，现在也没有，<code>d=====(￣▽￣*)b</code></p>
+<h1 id="一些模板代码dirty">一些模板代码(dirty)</h1>
+<a id="more"></a>
+<h2 id="命令行参数设置">命令行参数设置</h2>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import argparse</span><br><span class="line">import torch</span><br><span class="line">import torch.nn as nn</span><br><span class="line">import torch.optim as optim</span><br><span class="line">from torchvision import datasets, transforms</span><br><span class="line">from torch.autograd import Variable</span><br><span class="line">from time import time</span><br><span class="line"></span><br><span class="line">parser = argparse.ArgumentParser(description='PyTorch Training')</span><br><span class="line"></span><br><span class="line">parser.add_argument('<span class="comment">--dataset', type=str, default='cifar10',</span></span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'training dataset (default: cifar10)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--fine-tune'</span>, <span class="keyword">default</span>=<span class="string">''</span>, <span class="keyword">type</span>=<span class="keyword">str</span>, metavar=<span class="string">'PATH'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'fine-tune from pruned model'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--batch-size'</span>, <span class="keyword">type</span>=<span class="built_in">int</span>, <span class="keyword">default</span>=<span class="number">100</span>, metavar=<span class="string">'N'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'input batch size for training (default: 100)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--test-batch-size'</span>, <span class="keyword">type</span>=<span class="built_in">int</span>, <span class="keyword">default</span>=<span class="number">1000</span>, metavar=<span class="string">'N'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'input batch size for testing (default: 1000)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--epochs'</span>, <span class="keyword">type</span>=<span class="built_in">int</span>, <span class="keyword">default</span>=<span class="number">160</span>, metavar=<span class="string">'N'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'number of epochs to train (default: 160)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--start-epoch'</span>, <span class="keyword">default</span>=<span class="number">0</span>, <span class="keyword">type</span>=<span class="built_in">int</span>, metavar=<span class="string">'N'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'manual epoch number (useful on restarts)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--lr'</span>, <span class="keyword">type</span>=<span class="built_in">float</span>, <span class="keyword">default</span>=<span class="number">0.1</span>, metavar=<span class="string">'LR'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'learning rate (default: 0.1)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--momentum'</span>, <span class="keyword">type</span>=<span class="built_in">float</span>, <span class="keyword">default</span>=<span class="number">0.9</span>, metavar=<span class="string">'M'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'SGD momentum (default: 0.9)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--weight-decay'</span>, <span class="string">'--wd'</span>, <span class="keyword">default</span>=<span class="number">1e-4</span>, <span class="keyword">type</span>=<span class="built_in">float</span>,</span><br><span class="line">                    metavar=<span class="string">'W'</span>, <span class="keyword">help</span>=<span class="string">'weight decay (default: 1e-4)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--resume'</span>, <span class="keyword">default</span>=<span class="string">''</span>, <span class="keyword">type</span>=<span class="keyword">str</span>, metavar=<span class="string">'PATH'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'path to latest checkpoint (default: none)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--no-cuda'</span>, <span class="keyword">action</span>=<span class="string">'store_true'</span>, <span class="keyword">default</span>=<span class="literal">False</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'disables CUDA training'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--seed'</span>, <span class="keyword">type</span>=<span class="built_in">int</span>, <span class="keyword">default</span>=<span class="number">1</span>, metavar=<span class="string">'S'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'random seed (default: 1)'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--log-interval'</span>, <span class="keyword">type</span>=<span class="built_in">int</span>, <span class="keyword">default</span>=<span class="number">100</span>, metavar=<span class="string">'N'</span>,</span><br><span class="line">                    <span class="keyword">help</span>=<span class="string">'how many batches to wait before logging training status'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--gpu-devices'</span>,<span class="keyword">type</span>=<span class="keyword">str</span>,<span class="keyword">default</span>=<span class="string">'0'</span>,<span class="keyword">help</span>=<span class="string">'decide which gpu devices to use.For exmaple:0,1'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--root'</span>,<span class="keyword">type</span>=<span class="keyword">str</span>,<span class="keyword">default</span>=<span class="string">'./'</span>, metavar=<span class="string">'PATH'</span>, <span class="keyword">help</span>=<span class="string">'path to save checkpoint'</span>)</span><br><span class="line">args = parser.parse_args()</span><br><span class="line"></span><br><span class="line">os.environ[<span class="string">'CUDA_VISIBLE_DEVICES'</span>] = args.gpu_devices</span><br><span class="line">print(<span class="string">'Using gpu devices:&#123;&#125;'</span>.format(os.environ[<span class="string">'CUDA_VISIBLE_DEVICES'</span>]))</span><br><span class="line">args.cuda = <span class="keyword">not</span> args.no_cuda <span class="keyword">and</span> torch.cuda.is_available()</span><br><span class="line"></span><br><span class="line">torch.manual_seed(args.seed)</span><br><span class="line"><span class="keyword">if</span> args.cuda:</span><br><span class="line">     torch.cuda.manual_seed(args.seed)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> args.root:</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(args.root):</span><br><span class="line">		os.mkdir(args.root)</span><br></pre></td></tr></table></figure>
+<h2 id="数据集读取cifar10">数据集读取(cifar10)</h2>
+<figure class="highlight roboconf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">kwargs = &#123;'<span class="attribute">num_workers'</span>: 1, 'pin_memory': True&#125; if args<span class="variable">.cuda</span> else &#123;&#125;</span><br><span class="line">train_loader = torch<span class="variable">.utils</span><span class="variable">.data</span><span class="variable">.DataLoader</span>(</span><br><span class="line">     datasets<span class="variable">.CIFAR</span>10('../data',train=True,download=False,</span><br><span class="line">          transform=transforms<span class="variable">.Compose</span>([</span><br><span class="line">               transforms<span class="variable">.Pad</span>(4),</span><br><span class="line">               transforms<span class="variable">.RandomCrop</span>(32),</span><br><span class="line">               transforms<span class="variable">.RandomHorizontalFlip</span>(),</span><br><span class="line">               transforms<span class="variable">.ToTensor</span>(),</span><br><span class="line">               transforms<span class="variable">.Normalize</span>((.5,.5,.5),(.5,.5,.5))</span><br><span class="line">               ])</span><br><span class="line">          ),batch_size=args<span class="variable">.batch_size</span>,shuffle=True,**kwargs</span><br><span class="line">     )</span><br><span class="line">test_loader = torch<span class="variable">.utils</span><span class="variable">.data</span><span class="variable">.DataLoader</span>(</span><br><span class="line">     datasets<span class="variable">.CIFAR</span>10('../data',train=False,</span><br><span class="line">          transform=transforms<span class="variable">.Compose</span>([</span><br><span class="line">               transforms<span class="variable">.ToTensor</span>(),</span><br><span class="line">               transforms<span class="variable">.Normalize</span>((.5,.5,.5),(.5,.5,.5))</span><br><span class="line">               ])</span><br><span class="line">          ),</span><br><span class="line">     batch_size = args<span class="variable">.test_batch_size</span>,shuffle=True,**kwargs</span><br><span class="line">     )</span><br></pre></td></tr></table></figure>
+<h2 id="训练及测试过程">训练及测试过程</h2>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">def</span> train(e):</span><br><span class="line">	model.train()</span><br><span class="line">	correct = <span class="number">0</span></span><br><span class="line">	train_size =<span class="number">0</span></span><br><span class="line">	for batch_idx,(<span class="class"><span class="keyword">data</span>,label) in enumerate(<span class="title">train_loader</span>):</span></span><br><span class="line">		<span class="keyword">if</span> args.cuda:</span><br><span class="line">			<span class="class"><span class="keyword">data</span>,label = <span class="keyword">data</span>.cuda(),label.cuda()</span></span><br><span class="line">		<span class="class"><span class="keyword">data</span>,label = <span class="type">Variable</span>(<span class="title">data</span>),<span class="type">Variable</span>(<span class="title">label</span>)</span></span><br><span class="line">		optimizer.zero_grad()</span><br><span class="line">		output = model(<span class="class"><span class="keyword">data</span>)</span></span><br><span class="line">		loss = criterion(output,label)</span><br><span class="line">		loss.backward()</span><br><span class="line">		optimizer.step()</span><br><span class="line">		pred = output.<span class="class"><span class="keyword">data</span>.max(1,<span class="title">keepdim</span>=<span class="type">True</span>)[1]</span></span><br><span class="line">		correct += pred.eq(label.<span class="class"><span class="keyword">data</span>.view_as(<span class="title">pred</span>)).cpu().sum()</span></span><br><span class="line">		train_size += len(<span class="class"><span class="keyword">data</span>)</span></span><br><span class="line">		<span class="keyword">if</span> (batch_idx + <span class="number">1</span>) % args.log_interval == <span class="number">0</span>:</span><br><span class="line">			print(<span class="string">"Epoch: &#123;&#125; [&#123;&#125;/&#123;&#125; (&#123;:.2f&#125;%)]\t Loss: &#123;:.6f&#125;\t Acc: &#123;:.6f&#125;"</span>.format(</span><br><span class="line">				e,</span><br><span class="line">				(batch_idx + <span class="number">1</span>) * len(<span class="class"><span class="keyword">data</span>),</span></span><br><span class="line">				len(train_loader.dataset),</span><br><span class="line">				<span class="number">100.</span> * (batch_idx + <span class="number">1</span>) / len(train_loader),</span><br><span class="line">				loss.<span class="class"><span class="keyword">data</span>[0],</span></span><br><span class="line">				correct / train_size</span><br><span class="line">				))</span><br><span class="line">			correct = <span class="number">0</span></span><br><span class="line">			train_size = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="title">def</span> test():</span><br><span class="line">	model.eval()</span><br><span class="line">	test_loss = <span class="number">0</span></span><br><span class="line">	correct = <span class="number">0</span></span><br><span class="line">	flag = <span class="type">False</span></span><br><span class="line">	criterion.size_average=<span class="type">False</span></span><br><span class="line">	start_time = time()</span><br><span class="line">	for <span class="class"><span class="keyword">data</span>,label in test_loader:</span></span><br><span class="line">		<span class="keyword">if</span> args.cuda:</span><br><span class="line">			<span class="class"><span class="keyword">data</span>,label = <span class="keyword">data</span>.cuda(),label.cuda()</span></span><br><span class="line">		<span class="class"><span class="keyword">data</span>,label = <span class="type">Variable</span>(<span class="title">data</span>,<span class="title">volatile</span>=<span class="type">True</span>),<span class="type">Variable</span>(<span class="title">label</span>)</span></span><br><span class="line">		output = model(<span class="class"><span class="keyword">data</span>)</span></span><br><span class="line">		test_loss += criterion(output,label).<span class="class"><span class="keyword">data</span>[0]</span></span><br><span class="line">		pred = output.<span class="class"><span class="keyword">data</span>.max(1,<span class="title">keepdim</span>=<span class="type">True</span>)[1]</span></span><br><span class="line">		correct += pred.eq(label.<span class="class"><span class="keyword">data</span>.view_as(<span class="title">pred</span>)).cpu().sum()</span></span><br><span class="line">	test_loss /= len(test_loader.dataset)</span><br><span class="line">	print('\n <span class="type">Test_average_loss</span>: &#123;:<span class="number">.4</span>f&#125;\t <span class="type">Acc</span>: &#123;&#125;/&#123;&#125; (&#123;:<span class="number">.1</span>f&#125;%)\t <span class="type">Time</span>: &#123;:<span class="number">.4</span>f&#125;s\n'.format(</span><br><span class="line">		test_loss,</span><br><span class="line">		correct,</span><br><span class="line">		len(test_loader.dataset),</span><br><span class="line">		<span class="number">100.</span> * correct / len(test_loader.dataset),</span><br><span class="line">		time() - start_time,</span><br><span class="line">		))</span><br><span class="line">	criterion.size_average=<span class="type">True</span></span><br><span class="line">	return correct / float(len(test_loader.dataset))</span><br><span class="line"></span><br><span class="line"><span class="title">def</span> save_checkpoint(state,is_best):</span><br><span class="line">	file = os.path.join(args.root,'checkpoint.pkl')</span><br><span class="line">	torch.save(state,file)</span><br><span class="line">	<span class="keyword">if</span> is_best:</span><br><span class="line">		shutil.copyfile(file,os.path.join(args.root,'model_best.pkl'))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="title">print</span>(model)</span><br><span class="line"><span class="title">print</span>('\n<span class="comment">-----Start Training-----\n')</span></span><br><span class="line"><span class="title">for</span> e <span class="keyword">in</span> range(args.start_epoch,args.epochs):</span><br><span class="line">	<span class="keyword">if</span> e <span class="keyword">in</span> [args.epochs*<span class="number">0.5</span>, args.epochs*<span class="number">0.75</span>]:</span><br><span class="line">		for param_group <span class="keyword">in</span> optimizer.param_groups:</span><br><span class="line">			param_group['lr'] *= <span class="number">0.1</span></span><br><span class="line">	train(e)</span><br><span class="line">	precision = test()</span><br><span class="line">	is_best = precision &gt; best_precision</span><br><span class="line">	training_state=&#123;</span><br><span class="line">	'cfg': cfg,</span><br><span class="line">	'start_epoch': e + <span class="number">1</span>,</span><br><span class="line">	'model_state_dict': model.state_dict(),</span><br><span class="line">	'optimizer': optimizer.state_dict(),</span><br><span class="line">	'precision': precision,</span><br><span class="line">	&#125;</span><br><span class="line">	save_checkpoint(</span><br><span class="line">		training_state,</span><br><span class="line">		is_best</span><br><span class="line">		)</span><br><span class="line"><span class="title">print</span>(<span class="string">"\n-----Training Completed-----\n"</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="最近的复现剪枝的一些代码部分">最近的复现剪枝的一些代码(部分)</h2>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="string">'\nPruning Start\n'</span>)</span><br><span class="line">total = <span class="number">0</span></span><br><span class="line">for m <span class="keyword">in</span> model.modules():</span><br><span class="line">	<span class="keyword">if</span> isinstance(m,nn.BatchNorm2d):</span><br><span class="line">		total += m.weight.<span class="keyword">data</span>.<span class="built_in">shape</span>[<span class="number">0</span>]</span><br><span class="line">bn = torch.zeros(total)</span><br><span class="line">idx = <span class="number">0</span></span><br><span class="line">for m <span class="keyword">in</span> model.modules():</span><br><span class="line">	<span class="keyword">if</span> isinstance(m,nn.BatchNorm2d):</span><br><span class="line">		<span class="built_in">size</span> = m.weight.<span class="keyword">data</span>.<span class="built_in">shape</span>[<span class="number">0</span>]</span><br><span class="line">		bn[idx:(idx+<span class="built_in">size</span>)] = m.weight.<span class="keyword">data</span>.<span class="built_in">abs</span>().clone()</span><br><span class="line">		idx += <span class="built_in">size</span></span><br><span class="line">bn_sorted,bn_sorted_idx = torch.sort(bn)</span><br><span class="line">threshold_idx = <span class="built_in">int</span>(total * args.prune_rate)</span><br><span class="line">threshold = bn_sorted[threshold_idx]</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"Pruning Threshold: &#123;&#125;"</span>.<span class="keyword">format</span>(threshold))</span><br><span class="line"></span><br><span class="line">pruned = <span class="number">0</span></span><br><span class="line">cfg = []</span><br><span class="line">cfg_mask = []</span><br><span class="line"></span><br><span class="line">for i,m <span class="keyword">in</span> enumerate(model.modules()):</span><br><span class="line">	<span class="keyword">if</span> isinstance(m,nn.BatchNorm2d):</span><br><span class="line">		weight_copy = m.weight.<span class="keyword">data</span>.clone()</span><br><span class="line">		mask = weight_copy.<span class="built_in">abs</span>().gt(threshold).<span class="built_in">float</span>().cuda()</span><br><span class="line">		pruned += mask.<span class="built_in">shape</span>[<span class="number">0</span>] - torch.<span class="built_in">sum</span>(mask)</span><br><span class="line">		m.weight.<span class="keyword">data</span>.mul_(mask)</span><br><span class="line">		m.bias.<span class="keyword">data</span>.mul_(mask)</span><br><span class="line">		cfg.append(<span class="built_in">int</span>(torch.<span class="built_in">sum</span>(mask)))</span><br><span class="line">		cfg_mask.append(mask.clone())</span><br><span class="line">		<span class="built_in">print</span>(<span class="string">'Layer_idx: &#123;:d&#125; \t Total_channels: &#123;:d&#125; \t Remained_channels: &#123;:d&#125;'</span>.<span class="keyword">format</span>(</span><br><span class="line">			i,mask.<span class="built_in">shape</span>[<span class="number">0</span>],<span class="built_in">int</span>(torch.<span class="built_in">sum</span>(mask))</span><br><span class="line">			))</span><br><span class="line">	elif isinstance(m,nn.MaxPool2d):</span><br><span class="line">		cfg.append(<span class="string">'M'</span>)</span><br><span class="line"></span><br><span class="line">pruned_ratio = pruned / total</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"Pre-processing done! &#123;&#125;"</span>.<span class="keyword">format</span>(pruned_ratio))</span><br></pre></td></tr></table></figure>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">layer_idx = <span class="number">0</span></span><br><span class="line">start_mask = torch.ones(<span class="number">3</span>)</span><br><span class="line">end_mask = cfg_mask[layer_idx]</span><br><span class="line">change_first_linear = False</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> ((<span class="selector-tag">i</span>,m),m_new) <span class="keyword">in</span> zip(enumerate(model.modules()),new_model.modules()):</span><br><span class="line">	idx0 = torch.squeeze(torch.nonzero(start_mask))</span><br><span class="line">	idx1 = torch.squeeze(torch.nonzero(end_mask))</span><br><span class="line">	<span class="keyword">if</span> isinstance(m,nn.BatchNorm2d):</span><br><span class="line">		m_new<span class="selector-class">.weight</span><span class="selector-class">.data</span> = m<span class="selector-class">.weight</span><span class="selector-class">.data</span>[idx1].clone()</span><br><span class="line">		m_new<span class="selector-class">.bias</span><span class="selector-class">.data</span> = m<span class="selector-class">.bias</span><span class="selector-class">.data</span>[idx1].clone()</span><br><span class="line">		m_new<span class="selector-class">.running_mean</span> = m<span class="selector-class">.running_mean</span>[idx1].clone()</span><br><span class="line">		m_new<span class="selector-class">.running_var</span> = m<span class="selector-class">.running_var</span>[idx1].clone()</span><br><span class="line">		layer_idx += <span class="number">1</span></span><br><span class="line">		start_mask = end_mask.clone()</span><br><span class="line">		<span class="keyword">if</span> layer_idx &lt; len(cfg_mask):</span><br><span class="line">			end_mask = cfg_mask[layer_idx]</span><br><span class="line">	elif isinstance(m,nn.Conv2d):</span><br><span class="line">		w = m<span class="selector-class">.weight</span><span class="selector-class">.data</span>[:,idx0.tolist(),:,:].clone()</span><br><span class="line">		m_new<span class="selector-class">.weight</span><span class="selector-class">.data</span> = w[idx1.tolist(),:,:,:].clone()</span><br><span class="line">	elif isinstance(m,nn.Linear):</span><br><span class="line">		<span class="keyword">if</span> change_first_linear is False:</span><br><span class="line">			m_new<span class="selector-class">.weight</span><span class="selector-class">.data</span> = m<span class="selector-class">.weight</span><span class="selector-class">.data</span>[:,idx0.tolist()].clone()</span><br><span class="line">			change_first_linear = True</span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">			pass</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">print</span><span class="params">(<span class="string">'Pruning done! Channel pruning result:&#123;&#125;'</span>.format(cfg)</span></span>)</span><br><span class="line">torch.save(&#123;<span class="string">'cfg'</span>: cfg, <span class="string">'model_state_dict'</span>:new_model.state_dict()&#125;,os<span class="selector-class">.path</span><span class="selector-class">.join</span>(args<span class="selector-class">.save</span>,<span class="string">'model_pruned.pkl'</span>))</span><br></pre></td></tr></table></figure>
+<h2 id="一些有用和有趣的api持续更新">一些有用和有趣的api（持续更新）</h2>
+<p>来自<a href="http://pytorch.org/docs/master/index.html" target="_blank" rel="noopener"><strong>PyTorch Document</strong></a></p>
+<ol style="list-style-type: decimal">
+<li><code>torch.masked_select(input, mask, out=None) → Tensor</code></li>
+</ol>
+<p>Example</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; x = torch.randn(<span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">&gt;&gt;&gt; x</span><br><span class="line"></span><br><span class="line"> <span class="number">1.2045</span>  <span class="number">2.4084</span>  <span class="number">0.4001</span>  <span class="number">1.1372</span></span><br><span class="line"> <span class="number">0.5596</span>  <span class="number">1.5677</span>  <span class="number">0.6219</span> <span class="number">-0.7954</span></span><br><span class="line"> <span class="number">1.3635</span> <span class="number">-1.2313</span> <span class="number">-0.5414</span> <span class="number">-1.8478</span></span><br><span class="line">[torch.FloatTensor of size <span class="number">3</span>x4]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; mask = x.ge(<span class="number">0.5</span>)</span><br><span class="line">&gt;&gt;&gt; mask</span><br><span class="line"></span><br><span class="line"> <span class="number">1</span>  <span class="number">1</span>  <span class="number">0</span>  <span class="number">1</span></span><br><span class="line"> <span class="number">1</span>  <span class="number">1</span>  <span class="number">1</span>  <span class="number">0</span></span><br><span class="line"> <span class="number">1</span>  <span class="number">0</span>  <span class="number">0</span>  <span class="number">0</span></span><br><span class="line">[torch.ByteTensor of size <span class="number">3</span>x4]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; torch.masked_select(x, mask)</span><br><span class="line"></span><br><span class="line"> <span class="number">1.2045</span></span><br><span class="line"> <span class="number">2.4084</span></span><br><span class="line"> <span class="number">1.1372</span></span><br><span class="line"> <span class="number">0.5596</span></span><br><span class="line"> <span class="number">1.5677</span></span><br><span class="line"> <span class="number">0.6219</span></span><br><span class="line"> <span class="number">1.3635</span></span><br><span class="line">[torch.FloatTensor of size <span class="number">7</span>]</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pytorch/" rel="tag"># pytorch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/06/extranet-to-intranet/" rel="next" title="如何从外部网访问内部网的服务器">
+                <i class="fa fa-chevron-left"></i> 如何从外部网访问内部网的服务器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar_leo.jpg"
+                alt="Leo Lau" />
+            
+              <p class="site-author-name" itemprop="name">Leo Lau</p>
+              <p class="site-description motion-element" itemprop="description">A naive student from SZU</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/LeoLau94" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:leolauszu@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/leo-lau-30/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一些模板代码dirty"><span class="nav-number">1.</span> <span class="nav-text">一些模板代码(dirty)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#命令行参数设置"><span class="nav-number">1.1.</span> <span class="nav-text">命令行参数设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据集读取cifar10"><span class="nav-number">1.2.</span> <span class="nav-text">数据集读取(cifar10)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练及测试过程"><span class="nav-number">1.3.</span> <span class="nav-text">训练及测试过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最近的复现剪枝的一些代码部分"><span class="nav-number">1.4.</span> <span class="nav-text">最近的复现剪枝的一些代码(部分)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些有用和有趣的api持续更新"><span class="nav-number">1.5.</span> <span class="nav-text">一些有用和有趣的api（持续更新）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">哟，居然看到这儿来了！给你一朵小红花✿Leo Lau</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由亚空间引擎 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动，不试试看吗？骚年</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">博客 &mdash; Leo Lau</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
