@@ -95,7 +95,8 @@
 <meta property="og:image" content="https://leolau94.github.io/img/proxifier_proxy_rule.png">
 <meta property="og:image" content="https://leolau94.github.io/img/ssh_to_server.png">
 <meta property="og:image" content="https://leolau94.github.io/img/ccproxy_setting_advanced.png">
-<meta property="og:updated_time" content="2018-03-06T12:16:49.485Z">
+<meta property="og:image" content="https://leolau94.github.io/img/ccproxy_account2.png">
+<meta property="og:updated_time" content="2018-03-09T13:01:37.921Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何从外部网访问内部网的服务器">
 <meta name="twitter:description" content="相信大家都是选择使用远程控制内部网的一台机子，来实现这个功能的。但是我想对这种方式并不是特别满意，尤其是当我只是需要使用服务器的资源，至于其他的东西，我本地的机子都可以满足。因此，我一直都很渴望能够使用relay的方式来实现访问。 以下将要介绍如何使用teamviewer + ccproxy + proxifier来实现这个想法，所以，也多谢这几个软件，使得我无需直面真正的技术难题，功劳应当是它们">
@@ -398,6 +399,14 @@
 <p>2/10/2018更新</p>
 <hr>
 <p>使用teamviewer的过程中发现，如果在连接WiFi的情况下，直接接入网线并关闭WiFi，一定要重新登录一次teamviewer，因为直接使用会导致出现异常而无法正常工作，比如我的直接建立VPN连接后，客户端会掉线并一直无法登录（提示服务器未响应）。</p>
+<hr>
+<p>3/9/2018更新</p>
+<hr>
+<p>使用完之后如果不想在服务器端挂载本地代理连接外网时，输入密码连接，那么就可以把账户删除了。 但是切记一定不要只删除账号就完事，一定要还原到以下状态~ 否则，尽管可以使用wget来获取网页。。。但是还是无法正常连接外网的。</p>
+<div class="figure">
+<img src="/img/ccproxy_account2.png">
+
+</div>
 
       
     </div>
