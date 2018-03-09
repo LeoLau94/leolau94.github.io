@@ -52,19 +52,29 @@ parser.add_argument('--gpu-devices',type=str,default='0',help='decide which gpu 
 parser.add_argument('--root',type=str,default='./', metavar='PATH', help='path to save checkpoint')
 args = parser.parse_args()
 
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_devices
-print('Using gpu devices:{}'.format(os.environ['CUDA_VISIBLE_DEVICES']))
+
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
 torch.manual_seed(args.seed)
 if args.cuda:
      torch.cuda.manual_seed(args.seed)
+     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_devices
+     print('Using gpu devices:{}'.format(os.environ['CUDA_VISIBLE_DEVICES']))
 
 if args.root:
 	if not os.path.exists(args.root):
 		os.mkdir(args.root)
 
 ```
+
+---
+
+2018/3/10更新
+
+---
+
+发现一个不知道是PyTorch(0.30)还是CUDA(8.0)引起的一个bug，就是直接再代码中设置**os.environ['CUDA_VISIBLE_DEVICES']**，有时候会失效，也就是说，无论你设置为哪块GPU，它都只使用GPU0。暂时没发现引起这个bug的原因和出现的条件。因此，在命令行指定是最保险的做法。例如：**`CUDA_VISIBLE_DEVICES=1,2 python xx.py`**
+
 ## 数据集读取(cifar10)
 ```
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
