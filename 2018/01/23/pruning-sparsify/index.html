@@ -79,20 +79,28 @@
 
 
 
-<meta name="description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。">
+<meta name="description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。">
 <meta name="keywords" content="模型压缩与加速">
 <meta property="og:type" content="article">
 <meta property="og:title" content="剪枝与稀疏约束">
 <meta property="og:url" content="https://leolau94.github.io/2018/01/23/pruning-sparsify/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。">
+<meta property="og:description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://leolau94.github.io/img/paper6.png">
 <meta property="og:image" content="https://leolau94.github.io/img/paper7.png">
-<meta property="og:updated_time" content="2018-01-24T12:17:40.731Z">
+<meta property="og:image" content="https://leolau94.github.io/img/paper5_BN.jpg">
+<meta property="og:image" content="https://leolau94.github.io/img/pruning_paper5_illustration.png">
+<meta property="og:image" content="https://leolau94.github.io/img/pruning_paper5_multi_pass.png">
+<meta property="og:image" content="https://leolau94.github.io/img/pruning_paper5_result.png">
+<meta property="og:image" content="https://leolau94.github.io/img/pruning_paper5_multi_pass_result.png">
+<meta property="og:image" content="https://leolau94.github.io/img/pruning_paper6_algorithm.png">
+<meta property="og:image" content="https://leolau94.github.io/img/pruning_paper6_result1.png">
+<meta property="og:image" content="https://leolau94.github.io/img/pruning_paper6_result2.png">
+<meta property="og:updated_time" content="2018-04-08T04:03:02.345Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="剪枝与稀疏约束">
-<meta name="twitter:description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。">
+<meta name="twitter:description" content="剪枝&amp;amp;稀疏约束 剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。">
 <meta name="twitter:image" content="https://leolau94.github.io/img/paper6.png">
 
 
@@ -356,22 +364,95 @@
 
       
         <h1 id="剪枝稀疏约束">剪枝&amp;稀疏约束</h1>
-<p>剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。这里面就包含了滤波器级别的剪枝和稀疏连接，区别仅仅是剪枝的粒度不同。 <a id="more"></a> 常用的剪枝算法一般有如下操作流程：</p>
+<p>剪枝作为一种经典技术，已经被广泛运用到各种算法的后处理中。通过剪枝,在减少模型复杂度的同时，还能有效防止过拟合，提高泛化性。 <a id="more"></a></p>
+<p>一般而言，剪枝的分类可以从粒度和衡量方式上区分。粒度上有：连接层面和滤波器层面（通道层面）；衡量方式上有：权值和输出，而后者一般称为数据驱动的剪枝。</p>
+<p>连接层面的剪枝存在的一个普遍的缺点就是：权值分布不具有局部相关性，因此会导致实际的加速效果难以达到理论加速效果。如果想要达到理论上的加速比，那么就需要专门编写的运行库深圳相应的硬件设备，这制约了该方法的通用性。</p>
+<p>滤波器层面的剪枝则能很好地保留原有的权值结构（直接丢弃整个滤波器），但是由于保留的滤波器本身存在冗余，因此理论上其剪枝效果（对性能影响）并不如连接层面的精细。</p>
+<p>权值衡量的剪枝，是指直接利用权值来衡量连接或者滤波器的重要性，对于连接层面的剪枝，往往是通过权值的大小来衡量；而对于滤波器层面的剪枝，则常常使用<span class="math inline">\(L_1\)</span>和<span class="math inline">\(L_2\)</span>来衡量。这种衡量方式，往往是基于权值小的连接或者滤波器对网络贡献程度相对较小的假设，但是却与网络的输出没有直接的关系。一般而言，小权值对损失函数也会起到重要的影响，当压缩率较大的时候，直接剪除这些权值会造成不可逆的严重影响。</p>
+<p>数据驱动的剪枝相比之下，则是更加合理的选择。一般而言，这种剪枝也是与滤波器层面剪枝相适应的，因为很难计算某一连接对后续输出的影响。其主要思想是，如果一个滤波器的输出接近零，那么这个滤波器便是冗余可以移除的。</p>
+<p>常用的剪枝算法一般有如下操作流程：</p>
 <ol style="list-style-type: decimal">
 <li>衡量神经元的重要程度</li>
 <li>移除一部分不重要的神经元</li>
 <li>对网络进行微调（fine-tuning）</li>
 <li>返回第一步，进行下一轮剪枝。</li>
 </ol>
-<p>在实际操作中，还常常使用𝑙_1和𝑙_2进行正则化，以促使网络的权重趋向于零，以完成稀疏约束。</p>
+<p>在实际操作中，还常常使用<span class="math inline">\(L_1\)</span>和<span class="math inline">\(L_2\)</span>进行稀疏约束（正则化），以促使网络的权重趋向于零，提高剪枝效果。</p>
 <h1 id="相关研究">相关研究</h1>
-<p>连接层面的剪枝：文献[5]提出了一个简单有效的方法，就是直接将低于某个阈值的权重连接全部剪除。他们认为，如果某个连接的权重值过低，则意味着该连接并不十分重要，因而可以移除。之后进行fine-tuning以完成参数更新。如此反复迭代，直到剪枝后的网络在性能和规模上达到较好的平衡。他们最终在保持网络分类精度不下降的情况下，可以将参数数量减少9~10倍。</p>
-<p>滤波器级别剪枝：文献[6,7]提出的方法都非常相近，均是粒度为filter-level的剪枝方法，区别则是文献[6]使用LASSO进行剪枝选择，而文献[7]则使用贪婪算法。</p>
+<h2 id="连接层面的权值衡量剪枝">连接层面的权值衡量剪枝：</h2>
+<h3 id="文献learning-both-weights-and-connections-for-efficient-neural-network.1">文献<a href="https://arxiv.org/abs/1506.02626" target="_blank" rel="noopener">&quot;Learning both weights and connections for efficient neural network.&quot;[1]</a></h3>
+<p>直接将低于某个阈值的权值连接全部剪除。如果某个连接的权值过低，则表示该连接并不重要，因而可以移除。之后进行fine-tuning以完成参数更新。如此反复，直到剪枝后的网络在性能和规模上达到较好的平衡。他们在保持网络分类精度不下降的情况下将参数数量减少了9~10倍。不过，该方法的一个问题就是，剪枝后的权值分布不具有局部连续性，因此会导致cache和主存之间的频繁切换，从而实际的加速效果无法达到理论的加速效果。</p>
+<h2 id="滤波器层面的权值衡量剪枝">滤波器层面的权值衡量剪枝：</h2>
+<h3 id="文献pruning-filters-for-efficient-convnets2">文献<a href="https://arxiv.org/abs/1608.08710" target="_blank" rel="noopener">&quot;Pruning Filters for Efficient ConvNets&quot;[2]</a></h3>
+<p>计算每个滤波器权值绝对值之和，用来衡量滤波器重要程度。</p>
+<h2 id="滤波器层面的数据驱动剪枝">滤波器层面的数据驱动剪枝：</h2>
+<h3 id="文献channel-pruning-for-accelerating-very-deep-neural-networks.3和文献thinet-a-filter-level-pruning-method-for-deep-neural-network-compression.4">文献<a href="https://arxiv.org/abs/1707.06168" target="_blank" rel="noopener">&quot;Channel pruning for accelerating very deep neural networks.&quot;[3]</a>和文献<a href="https://arxiv.org/abs/1707.06342" target="_blank" rel="noopener">&quot;Thinet: A filter level pruning method for deep neural network compression.&quot;[4]</a></h3>
+<p>提出的方法都非常相近，均是粒度为filter-level的剪枝方法，区别则是文献[3]使用LASSO进行稀疏约束后剪枝，而文献[4]则使用贪婪算法进行剪枝。</p>
 <blockquote>
-<p><img src="/img/paper6.png" alt="paper_6"> 文献6</p>
+<p><img src="/img/paper6.png" alt="paper_6"> 文献3</p>
 </blockquote>
 <blockquote>
-<p><img src="/img/paper7.png" alt="paper_7"> 文献7</p>
+<p><img src="/img/paper7.png" alt="paper_7"> 文献4</p>
+</blockquote>
+<h3 id="文献learning-efficient-convolutional-networks-through-network-slimming5">文献<a href="https://arxiv.org/abs/1708.06519" target="_blank" rel="noopener">&quot;Learning Efficient Convolutional Networks through Network Slimming&quot;[5]</a></h3>
+<p>非常巧妙地利用了Batch Normalization层中的<span class="math inline">\(γ\)</span>放缩因子来衡量滤波器的重要程度。Batch Normalization的算法如下：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/paper5_BN.jpg" alt="paper5_BN">
+<p class="caption">paper5_BN</p>
+</div>
+</blockquote>
+<p>可以发现，<span class="math inline">\(γ\)</span>影响着滤波器输出结果<span class="math inline">\(x_i\)</span>（每个通道对应的feature map）对后续网络输出。因此，对应<span class="math inline">\(γ\)</span>值比较小的滤波器，可以直接移除（反正乘上<span class="math inline">\(γ\)</span>后输出都会变的比较小）。作者在训练过程中对<span class="math inline">\(γ\)</span>加入了LASSO进行稀疏约束，从而使得较小的<span class="math inline">\(γ\)</span>值压缩到0。另一个比较有意思的feature就是，作者认为这样的衡量方式是具有全局比较性的，也就是说，无需逐层进行层内比较后剪枝再微调。只需一次的全局剪枝后微调即可。而这大大降低了剪枝这种方法的繁琐性。个人认为这篇文献具有很好的参考价值。</p>
+<blockquote>
+<div class="figure">
+<img src="/img/pruning_paper5_illustration.png" alt="paper5_process">
+<p class="caption">paper5_process</p>
+</div>
+</blockquote>
+<p>作者还提出了循环迭代剪枝的方式，能够将压缩比例达到非常低的程度。</p>
+<blockquote>
+<div class="figure">
+<img src="/img/pruning_paper5_multi_pass.png" alt="paper5_multi_pass">
+<p class="caption">paper5_multi_pass</p>
+</div>
+</blockquote>
+<p>实验结果如下图：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/pruning_paper5_result.png" alt="paper5_result">
+<p class="caption">paper5_result</p>
+</div>
+</blockquote>
+<p>重复迭代的结果如下：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/pruning_paper5_multi_pass_result.png" alt="paper5_multi_pass_result">
+<p class="caption">paper5_multi_pass_result</p>
+</div>
+</blockquote>
+<h3 id="文献rethinking-the-smaller-norm-less-informative-assumption-in-channel-pruning-of-convolution-layers6">文献<a href="https://arxiv.org/abs/1802.00124" target="_blank" rel="noopener">&quot;Rethinking the Smaller-Norm-Less-Informative Assumption in Channel Pruning of Convolution Layers&quot;[6]</a></h3>
+<p>是一篇有意思的，对剪枝方法中一些关于稀疏约束带来的缺陷进行思考的文章（思考部分没怎么看明白）。文章提出的剪枝方法基于文献[5]，主要不同的是，作者不再使用传统的稀疏约束方式，而是使用了一种名为ISTA的稀疏约束方法。</p>
+<p>以下是该文章的算法：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/pruning_paper6_algorithm.png" alt="paper6_algorithm">
+<p class="caption">paper6_algorithm</p>
+</div>
+</blockquote>
+<p>实验结果如下图：</p>
+<p>cifar10:</p>
+<blockquote>
+<div class="figure">
+<img src="/img/pruning_paper6_result1.png" alt="paper6_result1">
+<p class="caption">paper6_result1</p>
+</div>
+</blockquote>
+<p>ILSVRC2012:</p>
+<blockquote>
+<div class="figure">
+<img src="/img/pruning_paper6_result2.png" alt="paper6_result2">
+<p class="caption">paper6_result2</p>
+</div>
 </blockquote>
 
       
@@ -599,7 +680,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#剪枝稀疏约束"><span class="nav-number">1.</span> <span class="nav-text">剪枝&amp;稀疏约束</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关研究"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#剪枝稀疏约束"><span class="nav-number">1.</span> <span class="nav-text">剪枝&amp;稀疏约束</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关研究"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#连接层面的权值衡量剪枝"><span class="nav-number">2.1.</span> <span class="nav-text">连接层面的权值衡量剪枝：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文献learning-both-weights-and-connections-for-efficient-neural-network.1"><span class="nav-number">2.1.1.</span> <span class="nav-text">文献&quot;Learning both weights and connections for efficient neural network.&quot;[1]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#滤波器层面的权值衡量剪枝"><span class="nav-number">2.2.</span> <span class="nav-text">滤波器层面的权值衡量剪枝：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文献pruning-filters-for-efficient-convnets2"><span class="nav-number">2.2.1.</span> <span class="nav-text">文献&quot;Pruning Filters for Efficient ConvNets&quot;[2]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#滤波器层面的数据驱动剪枝"><span class="nav-number">2.3.</span> <span class="nav-text">滤波器层面的数据驱动剪枝：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文献channel-pruning-for-accelerating-very-deep-neural-networks.3和文献thinet-a-filter-level-pruning-method-for-deep-neural-network-compression.4"><span class="nav-number">2.3.1.</span> <span class="nav-text">文献&quot;Channel pruning for accelerating very deep neural networks.&quot;[3]和文献&quot;Thinet: A filter level pruning method for deep neural network compression.&quot;[4]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文献learning-efficient-convolutional-networks-through-network-slimming5"><span class="nav-number">2.3.2.</span> <span class="nav-text">文献&quot;Learning Efficient Convolutional Networks through Network Slimming&quot;[5]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文献rethinking-the-smaller-norm-less-informative-assumption-in-channel-pruning-of-convolution-layers6"><span class="nav-number">2.3.3.</span> <span class="nav-text">文献&quot;Rethinking the Smaller-Norm-Less-Informative Assumption in Channel Pruning of Convolution Layers&quot;[6]</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
