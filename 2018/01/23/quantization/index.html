@@ -79,18 +79,23 @@
 
 
 
-<meta name="description" content="参数量化 所谓“量化”，指的是降低表达权重所需要的位数。">
+<meta name="description" content="参数量化 所谓“量化”，指的是降低表达权值所需要的位数。">
 <meta name="keywords" content="模型压缩与加速">
 <meta property="og:type" content="article">
 <meta property="og:title" content="参数量化">
 <meta property="og:url" content="https://leolau94.github.io/2018/01/23/quantization/index.html">
 <meta property="og:site_name" content="A Secret Garden">
-<meta property="og:description" content="参数量化 所谓“量化”，指的是降低表达权重所需要的位数。">
+<meta property="og:description" content="参数量化 所谓“量化”，指的是降低表达权值所需要的位数。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-01-24T12:13:06.779Z">
+<meta property="og:image" content="https://leolau94.github.io/img/quantilization_paper1_process.png">
+<meta property="og:image" content="https://leolau94.github.io/img/quantilization_paper1_backward.png">
+<meta property="og:image" content="https://leolau94.github.io/img/quantilization_paper1_result1.png">
+<meta property="og:image" content="https://leolau94.github.io/img/quantilization_paper1_result2.png">
+<meta property="og:updated_time" content="2018-04-08T08:14:47.195Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="参数量化">
-<meta name="twitter:description" content="参数量化 所谓“量化”，指的是降低表达权重所需要的位数。">
+<meta name="twitter:description" content="参数量化 所谓“量化”，指的是降低表达权值所需要的位数。">
+<meta name="twitter:image" content="https://leolau94.github.io/img/quantilization_paper1_process.png">
 
 
 
@@ -353,8 +358,44 @@
 
       
         <h1 id="参数量化">参数量化</h1>
-<p>所谓“量化”，指的是降低表达权重所需要的位数。 <a id="more"></a> 核心思路：从权重中归纳出若干“代表”，由这些“代表”来表示某一类权重的具体数值。“代表”被存储在码本(codebook)中，而原权重矩阵仅需记录各自的码表索引即可，从而极大地降低了存储开销。</p>
+<p>所谓“量化”，指的是降低表达权值所需要的位数。 <a id="more"></a> 核心思路：从权值中归纳出若干“代表”，由这些“代表”来表示某一类权重的具体数值。“代表”被存储在码本(codebook)中，而原权值矩阵仅需记录各自的码表索引即可，从而极大地降低了存储开销。一般而言，可以分为非结构化的标量量化和结构化的向量量化。</p>
 <h1 id="相关研究">相关研究</h1>
+<h2 id="标量量化">标量量化</h2>
+<h3 id="文献deep-compression-compressing-deep-neural-networks-with-pruning-trained-quantization-and-huffman-coding.1">文献<a href="https://arxiv.org/abs/1510.00149" target="_blank" rel="noopener">&quot;Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding.&quot;[1]</a></h3>
+<p>这篇文章在量化之前还使用了剪枝的方法（基于作者在另一篇文章中提出的，<a href="https://arxiv.org/abs/1506.02626" target="_blank" rel="noopener">&quot;Learning both weights and connections for efficient neural network.&quot;[1]</a>）。是一篇很好的具有启发性的模型综合压缩的文章。最后还提出了使用霍夫曼编码进行更进一步的压缩。过程如下图：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/quantilization_paper1_process.png" alt="paper1_process">
+<p class="caption">paper1_process</p>
+</div>
+</blockquote>
+<p>文中提出了一种量化方法，对于每个权值矩阵<span class="math inline">\(W∈R^{m×n}\)</span>，首先将其展平为向量形式<span class="math inline">\(w∈R^{1×mn}\)</span>，然后对这<span class="math inline">\(mn\)</span>个权值进行k-means聚类：</p>
+<blockquote>
+<p><span class="math inline">\(\arg min_c \sum_{i}^{mn} \sum_{j}^{k} \|W_i-c_j\|_2^2\)</span></p>
+</blockquote>
+<p>这样一来，只需将<span class="math inline">\(k\)</span>个聚类中心保存在码本中即可（仅需<span class="math inline">\(log_2^k\)</span>bits）。该方法能够将权值矩阵的存储空间降低为原来的<span class="math inline">\(\frac{mnb}{mnlog_2^k + kb}\)</span>，其中<span class="math inline">\(b\)</span>为存储原始权值所需要的比特位数。在网络性能损失不大的情况下，能够将模型大小减少8到16倍。不足之处在于，当压缩比率比较大时，分类精度会大幅下降。</p>
+<p>为了解决量化带来的精度降低，作者利用每个权值回传的梯度对当前的码本进行更新，具体为：将同一个类的权值回传的梯度相加，作为聚类中心的的梯度，然后进行更新。如下图：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/quantilization_paper1_backward.png" alt="paper1_backward_update">
+<p class="caption">paper1_backward_update</p>
+</div>
+</blockquote>
+<p>实验结果：</p>
+<blockquote>
+<div class="figure">
+<img src="/img/quantilization_paper1_result1.png" alt="paper1_result1">
+<p class="caption">paper1_result1</p>
+</div>
+</blockquote>
+<blockquote>
+<div class="figure">
+<img src="/img/quantilization_paper1_result2.png" alt="paper1_result2">
+<p class="caption">paper1_result2</p>
+</div>
+</blockquote>
+<h2 id="向量量化">向量量化</h2>
+<p>一种方法是乘积量化，基本思路是，先将权值矩阵划分为若干（<span class="math inline">\(s\)</span>）个不相交的子矩阵，然后依次对每个子矩阵进行聚类。之后执行标量量化的过程。向量量化考虑了更多的空间结构信息，具有更高的精度和鲁棒性，但是由于码本中存储的是向量，因此其压缩率为<span class="math inline">\((32mn)/(32knlog_2^{kms})\)</span></p>
 
       
     </div>
@@ -581,7 +622,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参数量化"><span class="nav-number">1.</span> <span class="nav-text">参数量化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关研究"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参数量化"><span class="nav-number">1.</span> <span class="nav-text">参数量化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关研究"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#标量量化"><span class="nav-number">2.1.</span> <span class="nav-text">标量量化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文献deep-compression-compressing-deep-neural-networks-with-pruning-trained-quantization-and-huffman-coding.1"><span class="nav-number">2.1.1.</span> <span class="nav-text">文献&quot;Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding.&quot;[1]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#向量量化"><span class="nav-number">2.2.</span> <span class="nav-text">向量量化</span></a></li></ol></li></ol></div>
             
 
           </div>
